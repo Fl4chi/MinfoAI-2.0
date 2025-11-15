@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Carica handlers
     await commandHandler(client);
-    await tHandler(client);
+    await eventHandler(client);
 
 // Login bot
 client.login(process.env.BOT_TOKEN).catch(err => {
