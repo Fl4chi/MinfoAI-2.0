@@ -21,7 +21,7 @@ client.commands = new Collection();
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then(() => {
+}).then((async ) => {
     logger.info('\u2705 Connesso a MongoDB con successo!');
 }).catch(err => {
     logger.error('\u274c Errore connessione MongoDB:', err);
@@ -29,8 +29,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 
 // Carica handlers
-commandHandler(client);
-eventHandler(client);
+    await commandHandler(client);
+    await tHandler(client);
 
 // Login bot
 client.login(process.env.BOT_TOKEN).catch(err => {
