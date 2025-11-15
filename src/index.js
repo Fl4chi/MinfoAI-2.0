@@ -21,7 +21,7 @@ client.commands = new Collection();
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then((async ) => {
+}).then(async () => {
     logger.info('\u2705 Connesso a MongoDB con successo!');
 
         // Carica handlers
