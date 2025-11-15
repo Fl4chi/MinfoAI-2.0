@@ -23,15 +23,17 @@ mongoose.connect(process.env.MONGODB_URI, {
     useUnifiedTopology: true
 }).then((async ) => {
     logger.info('\u2705 Connesso a MongoDB con successo!');
+
+        // Carica handlers
+    await commandHandler(client);
+    await eventHandler(client);
+
 }).catch(err => {
     logger.error('\u274c Errore connessione MongoDB:', err);
     process.exit(1);
 });
 
-// Carica handlers
-    await commandHandler(client);
-    await eventHandler(client);
-
+    
 // Login bot
 client.login(process.env.BOT_TOKEN).catch(err => {
     logger.error('\u274c Errore login bot:', err);
