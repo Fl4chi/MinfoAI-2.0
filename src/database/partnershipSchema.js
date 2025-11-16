@@ -191,13 +191,6 @@ const partnershipSchema = new mongoose.Schema({
   }
 }, { timestamps: true, collection: 'partnerships' });
 
-// Indexes for performance
-partnershipSchema.index({ partnershipId: 1 });
-partnershipSchema.index({ 'primaryGuild.guildId': 1 });
-partnershipSchema.index({ 'secondaryGuild.guildId': 1 });
-partnershipSchema.index({ status: 1 });
-partnershipSchema.index({ tier: 1 });
-partnershipSchema.index({ startedAt: 1 });
 
 const Partnership = mongoose.model('Partnership', partnershipSchema);
 
