@@ -19,10 +19,7 @@ const client = new Client({
 client.commands = new Collection();
 
 // Connessione MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(async () => {
+mongoose.connect(process.env.MONGODB_URI).then(async () => {
   errorLogger.logInfo('INFO', 'Connesso a MongoDB con successo!', 'DB_CONNECTION_SUCCESS');
 
   // Carica handlers
@@ -39,10 +36,12 @@ process.on('unhandledRejection', err => {
 });
 
 process.on('uncaughtException', err => {
-  errorLogger.logError('CRITICAL', 'Eccezione non gestita', 'UNCAUGHT_EXCEPTION', err);
+  errorLogger.logError('CRITICAL', 'Eccezione non catturata', 'UNCAUGHT_EXCEPTION', err);
 });
 
 // Login bot
 client.login(process.env.DISCORD_TOKEN).catch(err => {
   errorLogger.logError('CRITICAL', 'Errore login Discord', 'DISCORD_CONNECTION_FAILED', err);
 });
+
+module.exports = client;
