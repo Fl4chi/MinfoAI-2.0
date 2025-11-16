@@ -6,44 +6,34 @@ const errorLogger = require('../../utils/errorLogger');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('partnership-stats')
-    .setDescription('📈 Mostra statistiche complete delle partnership'),
+    .setDescription('📊 Statistiche partnership'),
 
   async execute(interaction) {
-    await interaction.deferReply();
-
+    await interaction.deferReply({ ephemeral: true });
     try {
-      const totalPartnerships = await Partnership.countDocuments();
-      const activePartnerships = await Partnership.countDocuments({ status: 'active' });
-      const pendingPartnerships = await Partnership.countDocuments({ status: 'pending' });
-      const rejectedPartnerships = await Partnership.countDocuments({ status: 'rejected' });
+      const total = await Partnership.countDocuments();
+      const active = await Partnership.countDocuments({ status: 'active' });
+      const pending = await Partnership.countDocuments({ status: 'pending' });
+      const rejected = await Partnership.countDocuments({ status: 'rejected' });
 
-      // Partnership per tier
-      const bronzeCount = await Partnership.countDocuments({ tier: 'bronze', status: 'active' });
-      const silverCount = await Partnership.countDocuments({ tier: 'silver', status: 'active' });
-      const goldCount = await Partnership.countDocuments({ tier: 'gold', status: 'active' });
-      const platinumCount = await Partnership.countDocuments({ tier: 'platinum', status: 'active' });
+      errorLogger.logInfo('INFO', `Stats generated`, 'STATS');
 
-      const embed = CustomEmbedBuilder.info(
-        '📈 Statistiche Partnership',
-        'Panoramica completa del sistema partnership'
-      )
-        .addFields(
-          { name: '📊 Totale Partnership', value: totalPartnerships.toString(), inline: true },
-          { name: '👥 Attive', value: activePartnerships.toString(), inline: true },
-          { name: '⏳ In Attesa', value: pendingPartnerships.toString(), inline: true },
-          { name: '🛻 Rifiutate', value: rejectedPartnerships.toString(), inline: true },
-          { name: '\n🌟 Tier - Bronze', value: bronzeCount.toString(), inline: true },
-          { name: '🤔 Tier - Silver', value: silverCount.toString(), inline: true },
-          { name: '🎯 Tier - Gold', value: goldCount.toString(), inline: true },
-          { name: '👑 Tier - Platinum', value: platinumCount.toString(), inline: true }
-        );
+      const embed = CustomEmbedBuilder.info('📊 Statistics',
+        `**Totale:** ${total}\n` +
+        `**Attive:** ${active} (${((active/total)*100).toFixed(1)}%)\n` +
+        `**In Attesa:** ${pending} (${((pending/total)*100).toFixed(1)}%)\n` +
+        `**Rifiutate:** ${rejected} (${((rejected/total)*100).toFixed(1)}%)`);
 
-      errorLogger.logInfo('INFO', `Partnership stats retrieved - Total: ${totalPartnerships}, Active: ${activePartnerships}`, 'PARTNERSHIP_STATS_VIEWED');
       await interaction.editReply({ embeds: [embed] });
+
     } catch (error) {
-      errorLogger.logError('ERROR', 'Error retrieving partnership stats', 'PARTNERSHIP_STATS_FAILED', error);
-      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nel recupero delle statistiche.');
-      await interaction.editReply({ embeds: [embed] });
+      errorLogger.logError('ERROR', 'Stats failed', 'FAILED', error);
+      const embed = CustomEmbedBuilder.error('📊 Errore', 'Errore nelle statistiche');
+      try {
+        await interaction.editReply({ embeds: [embed] });
+      } catch (e) {
+        errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
+      }
     }
   }
 };
