@@ -15,28 +15,35 @@ module.exports = {
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
-
-    const partnershipId = interaction.options.getString('partnership-id');
-
     try {
-      const partnership = await Partnership.findOneAndDelete({ id: partnershipId });
+      const partnershipId = interaction.options.getString('partnership-id');
+
+      const partnership = await Partnership.findOneAndDelete({ id: partnershipId }).catch(err => {
+        errorLogger.logError('ERROR', 'DB delete failed', 'DB_ERROR', err);
+        throw err;
+      });
 
       if (!partnership) {
-        errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'PARTNERSHIP_NOT_FOUND');
-        return interaction.editReply({ content: '❌ Partnership non trovata' });
+        errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'NOT_FOUND');
+        const embed = CustomEmbedBuilder.error('🗑️ Non Trovata', 'Partnership non trovata');
+        return interaction.editReply({ embeds: [embed] });
       }
 
-      const embed = CustomEmbedBuilder.success(
-        '✅ Partnership Eliminata',
-        `La partnership con **${partnership.primaryGuild.guildName}** è stata eliminata definitivamente.`
-      );
+      errorLogger.logInfo('INFO', `Partnership deleted: ${partnershipId}`, 'DELETED');
 
-      errorLogger.logInfo('INFO', `Partnership deleted: ${partnershipId}`, 'PARTNERSHIP_DELETED');
+      const embed = CustomEmbedBuilder.success('🗑️ Eliminata',
+        `Partnership \`${partnershipId}\` eliminata con successo.`);
+
       await interaction.editReply({ embeds: [embed] });
+
     } catch (error) {
-      errorLogger.logError('ERROR', 'Error deleting partnership', 'PARTNERSHIP_DELETE_FAILED', error);
-      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nell\'eliminazione della partnership.');
-      await interaction.editReply({ embeds: [embed] });
+      errorLogger.logError('ERROR', 'Delete failed', 'FAILED', error);
+      const embed = CustomEmbedBuilder.error('🗑️ Errore', 'Errore nell\'eliminazione');
+      try {
+        await interaction.editReply({ embeds: [embed] });
+      } catch (e) {
+        errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
+      }
     }
   }
 };
