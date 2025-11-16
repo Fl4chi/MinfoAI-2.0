@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const logger = require('../utils/logger');
+const errorLogger = require('../utils/errorLogger');
 
 module.exports = async (client) => {
   const eventsPath = path.join(__dirname, '..', 'events');
@@ -15,7 +15,7 @@ module.exports = async (client) => {
     } else {
       client.on(eventName, (...args) => event.execute(...args, client));
     }
-    
-    logger.success(`Loaded event: ${eventName}`);
+
+    errorLogger.logInfo('INFO', `Loaded event: ${eventName}`, 'EVENT_LOADED');
   }
 };
