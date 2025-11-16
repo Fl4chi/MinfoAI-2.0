@@ -1,7 +1,9 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
+const ollamaAI = require('../../ai/ollamaAI');
+const userProfiler = require('../../ai/userProfiler');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
@@ -23,27 +25,43 @@ module.exports = {
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
-
-    const serverName = interaction.options.getString('server-name');
-    const inviteLink = interaction.options.getString('invite-link');
-    const description = interaction.options.getString('description');
-
     try {
-      // Check if partnership already exists
+      const serverName = interaction.options.getString('server-name');
+      const inviteLink = interaction.options.getString('invite-link');
+      const description = interaction.options.getString('description');
+
+      if (!inviteLink.includes('discord.gg') && !inviteLink.includes('discord.com/invite')) {
+        errorLogger.logWarn('WARNING', `Invalid link from ${interaction.user.id}`, 'INVALID_INVITE');
+        const embed = CustomEmbedBuilder.error('❌ Link Non Valido', 'Usa link Discord valido');
+        return interaction.editReply({ embeds: [embed] });
+      }
+
+      if (description.length < 10 || description.length > 500) {
+        errorLogger.logWarn('WARNING', `Invalid length: ${description.length}`, 'LENGTH_ERROR');
+        const embed = CustomEmbedBuilder.error('❌ Descrizione Invalida', '10-500 caratteri');
+        return interaction.editReply({ embeds: [embed] });
+      }
+
       const existing = await Partnership.findOne({
         $or: [
           { 'primaryGuild.guildId': interaction.guildId },
           { 'secondaryGuild.guildId': interaction.guildId }
         ]
+      }).catch(err => {
+        errorLogger.logError('ERROR', 'DB query failed', 'DB_ERROR', err);
+        throw err;
       });
 
       if (existing) {
-        errorLogger.logWarn('WARNING', `Partnership already exists for guild ${interaction.guildId}`, 'PARTNERSHIP_ALREADY_EXISTS');
-        const embed = CustomEmbedBuilder.error('❌ Errore', 'Una partnership è già in corso per questo server.');
+        errorLogger.logWarn('WARNING', `Partnership exists`, 'EXISTS');
+        const embed = CustomEmbedBuilder.error('❌ Già Esiste', `Status: ${existing.status}`);
         return interaction.editReply({ embeds: [embed] });
       }
 
-      // Create partnership request
+      const userProfile = await userProfiler.buildUserProfile(interaction.user, interaction.guild);
+      const aiAnalysis = await ollamaAI.analyzeUserProfile(userProfile);
+      const credScore = calculateCredibility(userProfile);
+
       const partnership = new Partnership({
         id: uuidv4(),
         status: 'pending',
@@ -55,22 +73,55 @@ module.exports = {
           description: description,
           userId: interaction.user.id
         },
+        aiAnalysis: {
+          userProfile: aiAnalysis,
+          credibilityScore: credScore,
+          timestamp: new Date()
+        },
         createdAt: new Date()
       });
 
-      await partnership.save();
-      errorLogger.logInfo('INFO', `Partnership request created: ${partnership.id}`, 'PARTNERSHIP_REQUEST_CREATED');
+      await partnership.save().catch(err => {
+        errorLogger.logError('ERROR', 'Save failed', 'SAVE_ERROR', err);
+        throw err;
+      });
 
-      const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata', 
-        `La tua richiesta di partnership per **${serverName}** è stata inviata con successo.\n\n` +
-        `ID Richiesta: \`${partnership.id}\`\n` +
-        `In attesa di approvazione...`);
+      errorLogger.logInfo('INFO', `Partnership created: ${partnership.id}`, 'CREATED');
+
+      const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata',
+        `Partnership per **${serverName}** inviata!\n\n` +
+        `**ID:** \`${partnership.id}\`\n` +
+        `**Profilo AI:** ${aiAnalysis}\n` +
+        `**Credibilità:** ${'⭐'.repeat(Math.ceil(credScore / 20))} (${credScore}%)\n` +
+        `**Status:** In attesa`);
 
       await interaction.editReply({ embeds: [embed] });
+      errorLogger.logInfo('INFO', `Request sent`, 'SENT');
+
     } catch (error) {
-      errorLogger.logError('ERROR', 'Error creating partnership request', 'PARTNERSHIP_REQUEST_FAILED', error);
-      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore durante la creazione della richiesta di partnership.');
-      await interaction.editReply({ embeds: [embed] });
+      errorLogger.logError('ERROR', 'Command failed', 'FAILED', error);
+      const embed = CustomEmbedBuilder.error('❌ Errore', 'Riprova dopo');
+      try {
+        await interaction.editReply({ embeds: [embed] });
+      } catch (e) {
+        errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
+      }
     }
   }
 };
+
+function calculateCredibility(userProfile) {
+  try {
+    let score = 0;
+    const daysSinceJoin = Math.floor((Date.now() - userProfile.joinDate) / (1000 * 60 * 60 * 24));
+    score += Math.min(daysSinceJoin * 2, 30);
+    score += Math.min(userProfile.totalMessages / 50, 20);
+    score += (userProfile.partnershipsCompleted || 0) * 10;
+    score += Math.min((userProfile.coins || 0) / 100, 15);
+    score += Math.min((userProfile.reputation || 0) * 5, 15);
+    return Math.min(score, 100);
+  } catch (error) {
+    errorLogger.logError('ERROR', 'Calc error', 'CALC_ERROR', error);
+    return 50;
+  }
+}
