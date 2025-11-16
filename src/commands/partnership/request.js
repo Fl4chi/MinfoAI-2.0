@@ -1,12 +1,13 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
+const errorLogger = require('../../utils/errorLogger');
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('partnership-request')
-    .setDescription('Richiedi una partnership con questo server')
+    .setDescription('📬 Richiedi una partnership con questo server')
     .addStringOption(option =>
       option.setName('server-name')
         .setDescription('Nome del tuo server')
@@ -37,44 +38,39 @@ module.exports = {
       });
 
       if (existing) {
-        return interaction.editReply({
-          content: '❌ Esiste già una partnership con questo server!',
-        });
+        errorLogger.logWarn('WARNING', `Partnership already exists for guild ${interaction.guildId}`, 'PARTNERSHIP_ALREADY_EXISTS');
+        const embed = CustomEmbedBuilder.error('❌ Errore', 'Una partnership è già in corso per questo server.');
+        return interaction.editReply({ embeds: [embed] });
       }
 
-      // Create new partnership request
-      const partnershipId = uuidv4();
-      const newPartnership = new Partnership({
-        partnershipId,
+      // Create partnership request
+      const partnership = new Partnership({
+        id: uuidv4(),
+        status: 'pending',
         primaryGuild: {
           guildId: interaction.guildId,
-          guildName: serverName,
-          guildIcon: interaction.guild.iconURL(),
-          ownerUserId: interaction.user.id,
-          ownerUsername: interaction.user.tag,
-          memberCount: interaction.guild.memberCount,
+          guildName: interaction.guild.name,
+          serverName: serverName,
+          inviteLink: inviteLink,
           description: description,
-          inviteLink: inviteLink
+          userId: interaction.user.id
         },
-        status: 'pending',
-        requestedBy: interaction.user.id,
-        tier: 'bronze'
+        createdAt: new Date()
       });
 
-      await newPartnership.save();
+      await partnership.save();
+      errorLogger.logInfo('INFO', `Partnership request created: ${partnership.id}`, 'PARTNERSHIP_REQUEST_CREATED');
 
-      const embed = CustomEmbedBuilder.success(
-        'Partnership Richiesta',
-        `✅ La tua richiesta di partnership è stata inviata!\n\n**Server:** ${serverName}\n**ID Richiesta:** \`${partnershipId}\`\n\nAttendi l'approvazione da uno staff.`
-      );
+      const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata', 
+        `La tua richiesta di partnership per **${serverName}** è stata inviata con successo.\n\n` +
+        `ID Richiesta: \`${partnership.id}\`\n` +
+        `In attesa di approvazione...`);
 
       await interaction.editReply({ embeds: [embed] });
-
     } catch (error) {
-      console.error('Error creating partnership request:', error);
-      await interaction.editReply({
-        content: '❌ Errore durante la creazione della richiesta. Riprova.',
-      });
+      errorLogger.logError('ERROR', 'Error creating partnership request', 'PARTNERSHIP_REQUEST_FAILED', error);
+      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore durante la creazione della richiesta di partnership.');
+      await interaction.editReply({ embeds: [embed] });
     }
   }
 };
