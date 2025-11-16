@@ -1,12 +1,13 @@
-const logger = require('../utils/logger');
+const errorLogger = require('../utils/errorLogger');
 
 module.exports = {
   name: 'ready',
   once: true,
-  async execute(client) {
-    logger.success(`Bot online come ${client.user.tag}`);
-    logger.info(`In ${client.guilds.cache.size} server`);
+  execute(client) {
+    errorLogger.logInfo('INFO', `Bot online come ${client.user.tag}`, 'BOT_READY');
+    errorLogger.logInfo('INFO', `In ${client.guilds.cache.size} server`, 'BOT_GUILD_COUNT');
     
     client.user.setActivity('Partnership System v2.0', { type: 'WATCHING' });
+    errorLogger.logInfo('INFO', 'Bot status updated', 'BOT_STATUS_SET');
   }
 };
