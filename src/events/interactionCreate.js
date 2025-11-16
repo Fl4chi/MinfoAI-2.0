@@ -1,21 +1,23 @@
-const logger = require('../utils/logger');
+const errorLogger = require('../utils/errorLogger');
 
 module.exports = {
   name: 'interactionCreate',
   async execute(interaction, client) {
     // Handle slash commands
-    if (interaction.isChatInputCommand()) {
+    if (interaction.isCommand()) {
       const command = client.commands.get(interaction.commandName);
-      
+
       if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
+        errorLogger.logError('ERROR', `No command matching ${interaction.commandName} was found.`, 'COMMAND_NOT_FOUND');
         return;
       }
 
       try {
         await command.execute(interaction);
+        errorLogger.logInfo('INFO', `Command executed: ${interaction.commandName}`, 'COMMAND_EXECUTED');
       } catch (error) {
-        console.error(`Error executing ${interaction.commandName}:`, error);
+        errorLogger.logError('ERROR', `Error executing ${interaction.commandName}: ${error.message}`, 'COMMAND_EXECUTION_FAILED');
+
         // Robust error handling with reply safety
         const errorMessage = {
           content: 'There was an error while executing this command!',
@@ -29,7 +31,7 @@ module.exports = {
             await interaction.reply(errorMessage);
           }
         } catch (replyError) {
-          logger.error('Could not send error message to user');
+          errorLogger.logError('ERROR', `Could not send error message to user: ${replyError.message}`, 'ERROR_REPLY_FAILED');
         }
       }
     }
