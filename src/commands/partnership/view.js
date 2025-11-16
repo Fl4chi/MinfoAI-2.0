@@ -1,11 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
+const errorLogger = require('../../utils/errorLogger');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('partnership-view')
-    .setDescription('Visualizza dettagli di una partnership')
+    .setDescription('🔍 Visualizza dettagli di una partnership')
     .addStringOption(option =>
       option.setName('partnership-id')
         .setDescription('ID della partnership')
@@ -17,27 +18,28 @@ module.exports = {
     const partnershipId = interaction.options.getString('partnership-id');
 
     try {
-      const partnership = await Partnership.findOne({ partnershipId });
+      const partnership = await Partnership.findOne({ id: partnershipId });
 
       if (!partnership) {
-        return interaction.editReply({ content: '❌ Partnership non trovata!' });
+        errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'PARTNERSHIP_NOT_FOUND');
+        return interaction.editReply({ content: '❌ Partnership non trovata' });
       }
 
       const embed = CustomEmbedBuilder.info(
         `🔍 Partnership: ${partnership.primaryGuild.guildName}`,
-        `**Status:** ${partnership.status}\n**Tier:** ${partnership.tier}\n**ID:** \`${partnership.partnershipId}\``
+        `**Status:** ${partnership.status}\n**Tier:** ${partnership.tier || 'Standard'}\n**ID:** \`${partnership.id}\``
       )
         .addFields(
           { name: 'Server', value: partnership.primaryGuild.guildName, inline: true },
-          { name: 'Members', value: partnership.primaryGuild.memberCount.toString(), inline: true },
-          { name: 'Creata', value: partnership.createdAt.toLocaleDateString(), inline: true }
+          { name: 'Members', value: partnership.primaryGuild.memberCount?.toString() || 'N/A', inline: true },
         );
 
+      errorLogger.logInfo('INFO', `Partnership viewed: ${partnershipId}`, 'PARTNERSHIP_VIEWED');
       await interaction.editReply({ embeds: [embed] });
-
     } catch (error) {
-      console.error('Error viewing partnership:', error);
-      await interaction.editReply({ content: '❌ Errore nel recupero dei dettagli.' });
+      errorLogger.logError('ERROR', 'Error viewing partnership', 'PARTNERSHIP_VIEW_FAILED', error);
+      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nel recupero dei dettagli della partnership.');
+      await interaction.editReply({ embeds: [embed] });
     }
   }
 };
