@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
+const ollamaAI = require('../../ai/ollamaAI');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -13,33 +14,40 @@ module.exports = {
         .setRequired(true)),
 
   async execute(interaction) {
-    await interaction.deferReply();
-
-    const partnershipId = interaction.options.getString('partnership-id');
-
+    await interaction.deferReply({ ephemeral: true });
     try {
-      const partnership = await Partnership.findOne({ id: partnershipId });
+      const partnershipId = interaction.options.getString('partnership-id');
+
+      const partnership = await Partnership.findOne({ id: partnershipId }).catch(err => {
+        errorLogger.logError('ERROR', 'DB find failed', 'DB_ERROR', err);
+        throw err;
+      });
 
       if (!partnership) {
-        errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'PARTNERSHIP_NOT_FOUND');
-        return interaction.editReply({ content: '❌ Partnership non trovata' });
+        errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'NOT_FOUND');
+        const embed = CustomEmbedBuilder.error('🔍 Non Trovata', 'Partnership non trovata');
+        return interaction.editReply({ embeds: [embed] });
       }
 
-      const embed = CustomEmbedBuilder.info(
-        `🔍 Partnership: ${partnership.primaryGuild.guildName}`,
-        `**Status:** ${partnership.status}\n**Tier:** ${partnership.tier || 'Standard'}\n**ID:** \`${partnership.id}\``
-      )
-        .addFields(
-          { name: 'Server', value: partnership.primaryGuild.guildName, inline: true },
-          { name: 'Members', value: partnership.primaryGuild.memberCount?.toString() || 'N/A', inline: true },
-        );
+      errorLogger.logInfo('INFO', `Viewing partnership: ${partnershipId}`, 'VIEWED');
 
-      errorLogger.logInfo('INFO', `Partnership viewed: ${partnershipId}`, 'PARTNERSHIP_VIEWED');
+      const embed = CustomEmbedBuilder.info(`🔍 Partnership ${partnership.id}`,
+        `**Server:** ${partnership.primaryGuild.serverName}\n` +
+        `**Status:** ${partnership.status}\n` +
+        `**Creata:** ${partnership.createdAt.toLocaleDateString('it-IT')}\n` +
+        `**Descrizione:** ${partnership.primaryGuild.description}\n` +
+        `**AI Analysis:** ${partnership.aiAnalysis?.userProfile || 'N/A'}`);
+
       await interaction.editReply({ embeds: [embed] });
+
     } catch (error) {
-      errorLogger.logError('ERROR', 'Error viewing partnership', 'PARTNERSHIP_VIEW_FAILED', error);
-      const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nel recupero dei dettagli della partnership.');
-      await interaction.editReply({ embeds: [embed] });
+      errorLogger.logError('ERROR', 'View failed', 'FAILED', error);
+      const embed = CustomEmbedBuilder.error('🔍 Errore', 'Errore nella visualizzazione');
+      try {
+        await interaction.editReply({ embeds: [embed] });
+      } catch (e) {
+        errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
+      }
     }
   }
 };
