@@ -1,7 +1,7 @@
 const errorLogger = require('../utils/errorLogger');
 
 module.exports = {
-  name: 'ready',
+  name: 'clientReady',
   once: true,
   execute(client) {
     errorLogger.logInfo('INFO', `Bot online come ${client.user.tag}`, 'BOT_READY');
