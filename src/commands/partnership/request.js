@@ -5,6 +5,7 @@ const errorLogger = require('../../utils/errorLogger');
 const ollamaAI = require('../../ai/ollamaAI');
 const userProfiler = require('../../ai/userProfiler');
 const { v4: uuidv4 } = require('uuid');
+const { sendPartnershipNotification } = require('../../handlers/notificationHandler');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -87,6 +88,15 @@ module.exports = {
       });
 
       errorLogger.logInfo('INFO', `Partnership created: ${partnership.id}`, 'CREATED');
+      
+    // Send notifications to staff
+    try {
+      const staffRoleId = process.env.STAFF_ROLE_ID;
+      const guild = interaction.guild;
+      await sendPartnershipNotification(interaction.client, partnership, staffRoleId, guild);
+    } catch (notifError) {
+      errorLogger.logWarn('WARN', 'Failed to send notifications', 'NOTIF_FAIL');
+    }
 
       const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata',
         `Partnership per **${serverName}** inviata!\n\n` +
