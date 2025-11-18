@@ -565,3 +565,220 @@ I contributi sono benvenuti! Apri una PR o un'issue.
 ---
 
 **⭐ Se questo progetto ti è utile, lascia una star su GitHub!**`
+
+
+## 🚀 Guida Completa: Come Mandare ON il Bot Passo-Passo
+
+### 1️⃣ Creazione del Bot Discord
+
+**Passo 1: Accedi a Discord Developer Portal**
+- Vai su https://discord.com/developers/applications
+- Accedi con il tuo account Discord
+
+**Passo 2: Crea una Nuova Applicazione**
+- Clicca su "New Application"
+- Scegli un nome (es: "MinfoAI Partnership Bot")
+- Clicca "Create"
+
+**Passo 3: Crea il Bot**
+- Vai nella sezione "Bot" (sinistra)
+- Clicca "Add Bot"
+- Copia il **TOKEN** (secret code)
+
+### 2️⃣ Configurazione delle Autorizzazioni OAuth2
+
+**Passo 1: Autorizzazioni Richieste**
+- Vai in "OAuth2" → "URL Generator"
+- Seleziona gli SCOPES:
+  - ✅ `bot` - Per usare il bot
+  - ✅ `applications.commands` - Per slash commands
+
+**Passo 2: Seleziona i Permessi del Bot**
+Vedi il file `deploy-commands.js` per i permessi richiesti:
+- ✅ Send Messages
+- ✅ Embed Links
+- ✅ Use Slash Commands
+- ✅ Manage Messages
+- ✅ Read Message History
+- ✅ Mention @everyone/@here/All Roles
+
+**Passo 3: Copia l'URL Invito**
+- Copia l'URL generato dal bot
+- Aprilo nel browser per aggiungere il bot al tuo server
+
+### 3️⃣ Setup del Progetto Locale
+
+**Passo 1: Clona il Repository**
+```bash
+git clone https://github.com/Fl4chi/MinfoAI-2.0.git
+cd MinfoAI-2.0
+```
+
+**Passo 2: Installa le Dipendenze**
+```bash
+npm install
+```
+
+**Passo 3: Crea il File di Configurazione**
+```bash
+cp .env.example .env
+```
+
+**Passo 4: Configura il File .env**
+Apri `.env` e inserisci:
+```ini
+# Discord Bot
+DISCORD_TOKEN=your_bot_token_here
+CLIENT_ID=your_client_id_here
+GUILD_ID=your_guild_id_here
+
+# Database MongoDB
+MONGODB_URI=mongodb://localhost:27017/minfoai
+# O usa MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/minfoai
+
+# Canali Discord
+PARTNERSHIP_CHANNEL_ID=your_channel_id
+LOG_CHANNEL_ID=your_log_channel_id
+
+# Ruolo Staff
+STAFF_ROLE_ID=your_staff_role_id
+
+# Colori Embed
+EMBED_COLOR=#5865F2
+SUCCESS_COLOR=#57F287
+ERROR_COLOR=#ED4245
+
+# Sistema AI
+REMINDER_INTERVAL_HOURS=24
+DEPLOY_GLOBAL=false
+DEBUG=true
+```
+
+### 4️⃣ Setup MongoDB
+
+**Opzione A: MongoDB Locale**
+```bash
+# Installa MongoDB dal sito ufficiale
+# Avvia il servizio MongoDB
+mongod
+```
+
+**Opzione B: MongoDB Atlas (Cloud)**
+1. Vai su https://www.mongodb.com/cloud/atlas
+2. Crea un account gratuito
+3. Crea un cluster
+4. Copia la connection string
+5. Inseriscila in MONGODB_URI nel .env
+
+### 5️⃣ Deploy dei Comandi
+
+**Passo 1: Deploy dei Comandi Slash**
+```bash
+node deploy-commands.js
+```
+
+Avrai un output simile a:
+```
+✅ Successfully deployed 8 guild commands
+```
+
+### 6️⃣ Avvio del Bot
+
+**Opzione A: Avvio Semplice**
+```bash
+node src/index.js
+```
+
+**Opzione B: Avvio con Nodemon (consigliato per sviluppo)**
+```bash
+# Installa nodemon globalmente
+npm install -g nodemon
+
+# Avvia con nodemon
+nodemon src/index.js
+```
+
+**Opzione C: Avvio con PM2 (per produzione)**
+```bash
+# Installa PM2
+npm install -g pm2
+
+# Avvia il bot
+pm2 start src/index.js --name "MinfoAI"
+
+# Salva la configurazione
+pm2 save
+
+# Visualizza i log
+pm2 logs MinfoAI
+```
+
+### 7️⃣ Verifica del Funzionamento
+
+**Passo 1: Controlla i Log**
+Dovrai vedere nel terminale:
+```
+✅ Connesso a MongoDB con successo!
+✅ Evento caricato: ready
+✅ Bot pronto!
+```
+
+**Passo 2: Testa i Comandi**
+Nel tuo server Discord, digita:
+```
+/partner-request server:Test descrizione:Testing
+```
+
+Dovrebbe rispondere con un embed!
+
+### 8️⃣ Sistema AI - Promemoria Automatici
+
+Il bot invierà automaticamente promemoria ogni 24 ore (configurabile):
+- Partnership in attesa da 1 giorno
+- Partnership in attesa da 7 giorni
+- Partnership molto vecchie in sospeso
+
+**Configurare l'intervallo:**
+Modifica in `.env`:
+```
+REMINDER_INTERVAL_HOURS=12  # Ogni 12 ore
+```
+
+### 9️⃣ Risoluzione Problemi
+
+**Il bot non si avvia**
+```bash
+# Verifica il token
+echo $DISCORD_TOKEN
+
+# Verifica MongoDB
+mongosh "your_mongodb_uri"
+
+# Controlla i permessi del bot
+# Assicurati che il bot abbia i permessi corretti nel server
+```
+
+**Errore di permessi**
+```
+I comandi slash non funzionano → Riassicura che il bot abbia il permesso "Use Slash Commands"
+```
+
+**Errore MongoDB**
+```
+Errore di connessione → Verifica MONGODB_URI nel .env
+```
+
+### 🔟 Deployment su Server (VPS/Cloud)
+
+**Consigliato: Render.com o Railway.app**
+
+1. Crea un account su https://render.com
+2. Collega il tuo repository GitHub
+3. Imposta le variabili di ambiente (.env)
+4. Deploy automatico
+5. Il bot rimarrà online 24/7
+
+---
+
+**✨ Congratulazioni! Il tuo bot MinfoAI è pronto!** 🎉
