@@ -12,37 +12,6 @@ class ConversationalAI {
     }
 
     /**
-     * Risponde a una domanda dell'utente
-     * @param {String} question - Domanda dell'utente
-     * @param {Object} context - Contesto (user, guild, partnership)
-     * @returns {String} - Risposta AI
-     */
-    async askQuestion(question, context = {}) {
-        try {
-            // Categorizza la domanda
-            const category = this.categorizeQuestion(question);
-
-            // Costruisci prompt strutturato
-            const prompt = this.buildPrompt(question, context, category);
-
-            // Se Ollama è disponibile, usa l'AI
-            if (ollamaAI.isConnected) {
-                const response = await this.getOllamaResponse(prompt);
-                return this.formatResponse(response, category);
-            }
-
-            // Altrimenti usa risposte pre-programmate
-            return this.getFallbackResponse(question, context, category);
-
-        } catch (error) {
-            errorLogger.logError('ERROR', 'Errore in conversational AI', 'CONV_AI_ERROR', error);
-            return this.getErrorFallback();
-        }
-    }
-
-    /**
-     * Categorizza la domanda per un prompt più preciso
-     */
     categorizeQuestion(question) {
         const q = question.toLowerCase();
 
@@ -63,60 +32,6 @@ class ConversationalAI {
         }
         if (q.includes('statistic') || q.includes('dati') || q.includes('numeri')) {
             return 'statistics';
-        }
-
-        return 'general';
-    }
-
-    /**
-     * Costruisce il prompt per Ollama
-     */
-    buildPrompt(question, context, category) {
-        let prompt = `Sei MinfoAI Assistant, un assistente AI esperto in partnership Discord. Rispondi in italiano, in modo chiaro e conciso (max 400 caratteri).\n\n`;
-
-        // Aggiungi contesto server
-        if (context.guildName) {
-            prompt += `SERVER: ${context.guildName}\n`;
-            prompt += `Partnership attive: ${context.activePartnerships || 0}\n`;
-        }
-
-        // Aggiungi contesto utente
-        if (context.username) {
-            prompt += `\nUTENTE: ${context.username}\n`;
-            prompt += `Partnership completate: ${context.userPartnerships || 0}\n`;
-            prompt += `Trust Score: ${context.trustScore || 50}/100\n`;
-        }
-
-        // Aggiungi contesto partnership specifico
-        if (context.partnershipId) {
-            prompt += `\nPARTNERSHIP: ${context.partnershipId}\n`;
-            prompt += `Status: ${context.partnershipStatus || 'unknown'}\n`;
-        }
-
-        // Aggiungi knowledge base per categoria
-        const knowledge = this.knowledgeBase[category];
-        if (knowledge) {
-            prompt += `\nINFORMAZIONI UTILI:\n${knowledge}\n`;
-        }
-
-        // Domanda
-        prompt += `\nDOMANDA: ${question}\n\n`;
-
-        prompt += `ISTRUZIONI:\n`;
-        prompt += `- Rispondi in italiano\n`;
-        prompt += `- Sii pratico e diretto\n`;
-        prompt += `- Suggerisci comandi Discord quando utile (es: /comando)\n`;
-        prompt += `- Max 400 caratteri\n\n`;
-        prompt += `RISPOSTA:`;
-
-        return prompt;
-    }
-
-    /**
-     * Ottiene risposta da Ollama
-     */
-    async getOllamaResponse(prompt) {
-        try {
             const response = await fetch(`${ollamaAI.ollamaHost}/api/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -137,42 +52,6 @@ class ConversationalAI {
             return data.response;
 
         } catch (error) {
-            errorLogger.logError('ERROR', 'Errore chiamata Ollama', 'OLLAMA_CALL_ERROR', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Formatta la risposta AI
-     */
-    formatResponse(response, category) {
-        // Pulisci la risposta
-        let cleaned = response
-            .trim()
-            .replace(/^RISPOSTA:\s*/i, '')
-            .replace(/\n{3,}/g, '\n\n')
-            .substring(0, 400);
-
-        // Aggiungi emoji in base alla categoria
-        const emojis = {
-            partnership_approval: '✅',
-            tier_system: '⭐',
-            troubleshooting: '🔧',
-            how_to: '💡',
-            trust_score: '🛡️',
-            statistics: '📊',
-            general: '🤖'
-        };
-
-        const emoji = emojis[category] || '🤖';
-        return `${emoji} ${cleaned}`;
-    }
-
-    /**
-     * Risposta fallback se Ollama non è disponibile
-     */
-    getFallbackResponse(question, context, category) {
-        const fallbacks = {
             partnership_approval: `📋 **Criteri di Approvazione:**\n\n1. Server attivo (500+ membri)\n2. Descrizione chiara e completa\n3. Link invito permanente valido\n4. Motivazione convincente\n5. Trust score ≥ 40\n\nUsa \`/partnership-request\` con tutti i campi!`,
 
             tier_system: `⭐ **Tier Partnership:**\n\n🥉 **Bronze**: Base (0% bonus)\n🥈 **Silver**: +10% XP, badge\n🥇 **Gold**: +25% XP, ruolo speciale\n💎 **Platinum**: +50% XP, tutti i vantaggi\n\nComando: \`/partner-tier\``,
