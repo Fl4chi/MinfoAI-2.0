@@ -1,4 +1,5 @@
 const errorLogger = require('../utils/errorLogger');
+const AdvancedLogger = require('../utils/advancedLogger');
 
 /**
  * Sistema avanzato di gestione errori con AI
@@ -6,6 +7,7 @@ const errorLogger = require('../utils/errorLogger');
  */
 class AIErrorHandler {
   constructor() {
+        this.logger = logger;
     this.errorPatterns = new Map();
     this.errorHistory = [];
     this.maxHistorySize = 1000;
@@ -34,11 +36,11 @@ class AIErrorHandler {
       this.recordError(errorEntry);
 
       // Invia al logger
-      errorLogger.logError(errorType, errorMessage, errorCode, error);
+      this.logger?.error(errorType, errorMessage, errorCode, error);
 
       return errorEntry;
     } catch (err) {
-      errorLogger.logError('CRITICAL', 'Errore nel handler di errori AI', 'AI_ERROR_HANDLER_FAILED', err);
+      this.logger?.error('CRITICAL', 'Errore nel handler di errori AI', 'AI_ERROR_HANDLER_FAILED', err);
     }
   }
 
@@ -57,7 +59,7 @@ class AIErrorHandler {
 
       return analysis;
     } catch (err) {
-      errorLogger.logWarn('WARN', 'Errore nell\'analisi AI dell\'errore', 'AI_ANALYSIS_FAILED');
+      this.logger?.warn('WARN', 'Errore nell\'analisi AI dell\'errore', 'AI_ANALYSIS_FAILED');
       return null;
     }
   }
