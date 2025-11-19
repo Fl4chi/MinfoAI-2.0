@@ -6,7 +6,7 @@ const errorLogger = require('../../utils/errorLogger');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ai-help')
-        .setDescription('🤖 Chiedi aiuto all\'assistente AI per partnership, problemi o domande')
+        .setDescription('🤖 Chiedi consigli su partnership, miglioramenti server o risolvi problemi')
         .addStringOption(option =>
             option.setName('question')
                 .setDescription('La tua domanda o problema')
