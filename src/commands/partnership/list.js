@@ -24,8 +24,8 @@ module.exports = {
 
       errorLogger.logInfo('INFO', `Listing ${partnerships.length} partnerships`, 'LISTED');
 
-      const list = partnerships.map((p, i) => 
-        `**${i+1}.** ${p.primaryGuild.serverName} (${p.primaryGuild.guildId})`
+      const list = partnerships.map((p, i) =>
+        `**${i + 1}.** ${p.primaryGuild.serverName} (\`${p.partnershipId}\`)`
       ).join('\n');
 
       const embed = CustomEmbedBuilder.info('📊 Partnership Attive',

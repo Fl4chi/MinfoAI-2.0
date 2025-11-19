@@ -3,7 +3,8 @@ const PartnershipAI = require('../../database/partnershipAISchema');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
-const ollamaAI = require('../../ai/ollamaAI');
+// const ollamaAI = require('../../ai/ollamaAI'); // Removed to prevent node-fetch error if not needed immediately, or fix import if needed.
+const ollamaAI = require('../../ai/ollamaAI'); // Keep it but ensure ollamaAI.js is fixed.
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
     try {
       const partnershipId = interaction.options.getString('partnership-id');
-      
+
       // Fetch partnership data
       const partnership = await Partnership.findOne({ partnershipId }).catch(err => {
         errorLogger.logError('ERROR', 'DB query failed', 'DB_ERROR', err);
@@ -39,7 +40,7 @@ module.exports = {
       // Generate AI insights
       const healthScore = aiData.health?.engagementScore || 50;
       const retentionProb = aiData.health?.retentionProbability || 50;
-      
+
       // Build comprehensive embed
       const embed = new EmbedBuilder()
         .setColor('#5865F2')

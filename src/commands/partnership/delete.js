@@ -18,7 +18,7 @@ module.exports = {
     try {
       const partnershipId = interaction.options.getString('partnership-id');
 
-      const partnership = await Partnership.findOneAndDelete({ id: partnershipId }).catch(err => {
+      const partnership = await Partnership.findOneAndDelete({ partnershipId: partnershipId }).catch(err => {
         errorLogger.logError('ERROR', 'DB delete failed', 'DB_ERROR', err);
         throw err;
       });

@@ -1,6 +1,5 @@
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const mongoose = require('mongoose');
-const path = require('path');
 require('dotenv').config();
 const logger = require('./utils/logger');
 const errorLogger = require('./utils/errorLogger');
@@ -8,6 +7,15 @@ const commandHandler = require('./handlers/commandHandler');
 const eventHandler = require('./handlers/eventHandler');
 const AdvancedLogger = require('./utils/advancedLogger');
 const InteractionHandler = require('./handlers/interactionHandler');
+
+// Gestione errori processo globale
+process.on('unhandledRejection', (reason, promise) => {
+  errorLogger.logError('CRITICAL', 'Unhandled Rejection at:', 'UNHANDLED_REJECTION', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  errorLogger.logError('CRITICAL', 'Uncaught Exception:', 'UNCAUGHT_EXCEPTION', err);
+});
 
 const client = new Client({
   intents: [
@@ -20,38 +28,40 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Connessione MongoDB
-mongoose.connect(process.env.MONGODB_URI).then(async () => {
-  errorLogger.logInfo('INFO', 'Connesso a MongoDB con successo!', 'DB_CONNECTION_SUCCESS');
-
-  // Carica handlers
-  await commandHandler(client);
-  await eventHandler(client);
-  
-// Inizializza AdvancedLogger e InteractionHandler
-const advancedLogger = new AdvancedLogger(client, process.env.LOG_CHANNEL_ID);
-const interactionHandler = new InteractionHandler(client, advancedLogger);
-
-// Registra gli handlers di log e interazione nel client
-client.advancedLogger = advancedLogger;
-client.interactionHandler = interactionHandler;
-
-}).catch(err => {
-  errorLogger.logError('CRITICAL', 'Errore connessione MongoDB', 'DB_CONNECTION_FAILED', err);
+// Gestione errori client Discord
+client.on('error', (error) => {
+  errorLogger.logError('ERROR', 'Discord Client Error', 'DISCORD_CLIENT_ERROR', error);
 });
 
-// Gestione di errori non catturati
-process.on('unhandledRejection', err => {
-  errorLogger.logError('CRITICAL', 'Rejection non gestita', 'UNHANDLED_REJECTION', err);
-});
+const init = async () => {
+  try {
+    // 1. Connessione MongoDB
+    await mongoose.connect(process.env.MONGODB_URI);
+    logger.success('Connesso a MongoDB con successo!');
 
-process.on('uncaughtException', err => {
-  errorLogger.logError('CRITICAL', 'Eccezione non catturata', 'UNCAUGHT_EXCEPTION', err);
-});
+    // 2. Inizializzazione Sistemi Core
+    // Inizializza AdvancedLogger e InteractionHandler
+    const advancedLogger = new AdvancedLogger(client, process.env.LOG_CHANNEL_ID);
+    const interactionHandler = new InteractionHandler(client, advancedLogger);
 
-// Login bot
-client.login(process.env.DISCORD_TOKEN).catch(err => {
-  errorLogger.logError('CRITICAL', 'Errore login Discord', 'DISCORD_CONNECTION_FAILED', err);
-});
+    // Registra gli handlers nel client per accesso globale
+    client.advancedLogger = advancedLogger;
+    client.interactionHandler = interactionHandler;
+
+    // 3. Caricamento Handlers
+    await commandHandler(client);
+    await eventHandler(client);
+
+    // 4. Login Discord
+    await client.login(process.env.DISCORD_TOKEN);
+
+  } catch (err) {
+    console.error(err); // FORCE PRINT ERROR
+    errorLogger.logError('CRITICAL', `Errore fatale durante l'avvio: ${err.message}`, 'STARTUP_ERROR');
+    process.exit(1); // Termina se l'avvio fallisce
+  }
+};
+
+init();
 
 module.exports = client;

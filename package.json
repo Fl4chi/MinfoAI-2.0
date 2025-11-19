@@ -7,14 +7,21 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
-  "keywords": ["discord", "bot", "partnership", "discord.js"],
+  "keywords": [
+    "discord",
+    "bot",
+    "partnership",
+    "discord.js"
+  ],
   "author": "Fl4chi",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.2",
     "discord.js": "^14.14.1",
-    "mongoose": "^8.0.3",
     "dotenv": "^16.3.1",
-    "chalk": "^4.1.2"  },
+    "mongoose": "^8.0.3",
+    "uuid": "^13.0.0"
+  },
   "devDependencies": {
     "nodemon": "^3.0.2"
   },

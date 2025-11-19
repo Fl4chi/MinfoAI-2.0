@@ -21,11 +21,13 @@ module.exports = {
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+    // Define rejectButtons here or handle error reply without buttons if they are not created yet
+
     try {
       const partnershipId = interaction.options.getString('partnership-id');
       const reason = interaction.options.getString('reason') || 'Motivo non specificato';
 
-      const partnership = await Partnership.findOne({ id: partnershipId, status: 'pending' }).catch(err => {
+      const partnership = await Partnership.findOne({ partnershipId: partnershipId, status: 'pending' }).catch(err => {
         errorLogger.logError('ERROR', 'DB query failed', 'DB_ERROR', err);
         throw err;
       });
@@ -33,7 +35,7 @@ module.exports = {
       if (!partnership) {
         errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'NOT_FOUND');
         const embed = CustomEmbedBuilder.error('❌ Non Trovata', 'Partnership non trovata');
-        return interaction.editReply({ embeds: [embed], components: [rejectButtons] });
+        return interaction.editReply({ embeds: [embed] });
       }
 
       // AI: Genera feedback intelligente per il motivo
@@ -55,17 +57,17 @@ module.exports = {
       });
 
       errorLogger.logInfo('INFO', `Partnership rejected: ${partnershipId}`, 'REJECTED');
-      			client.advancedLogger?.partnership(`Partnership rejected: ${partnership.id}`, `Rejection buttons displayed for staff confirmation`)
+      interaction.client.advancedLogger?.partnership(`Partnership rejected: ${partnership.partnershipId}`, `Rejection buttons displayed for staff confirmation`)
 
       const embed = CustomEmbedBuilder.error('❌ Partnership Rifiutata',
-        `**ID:** \`${partnership.id}\`\n` +
+        `**ID:** \`${partnership.partnershipId}\`\n` +
         `**Motivo:** ${reason}\n` +
         `**AI Feedback:** ${aiReason}\n` +
         `**Status:** Rifiutata`);
-      
-		// Crea i bottoni per il rifiuto/azione da parte dello staff
-		const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
-		const rejectButtons = buttonHandler.createPartnershipRejectButtons(partnership.id);
+
+      // Crea i bottoni per il rifiuto/azione da parte dello staff
+      const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
+      const rejectButtons = buttonHandler.createPartnershipRejectButtons(partnership.partnershipId);
 
       await interaction.editReply({ embeds: [embed], components: [rejectButtons] });
 
@@ -73,7 +75,7 @@ module.exports = {
       errorLogger.logError('ERROR', 'Reject failed', 'FAILED', error);
       const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nel rifiuto');
       try {
-        await interaction.editReply({ embeds: [embed], components: [rejectButtons] });
+        await interaction.editReply({ embeds: [embed] });
       } catch (e) {
         errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
       }

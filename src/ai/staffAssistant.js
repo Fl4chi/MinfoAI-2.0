@@ -7,7 +7,7 @@
 const AIConfig = require('./ai.config');
 const userProfiler = require('./userProfiler');
 const partnershipMatcher = require('./partnershipMatcher');
-const errorLogger = require('../logging/errorLogger');
+const errorLogger = require('../utils/errorLogger');
 
 class StaffAssistant {
   constructor() {
@@ -45,7 +45,7 @@ class StaffAssistant {
 
       return staffProfile;
     } catch (error) {
-      errorLogger.error(`❌ Staff profile retrieval error for ${userId}`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Staff profile retrieval error for ${userId}`, 'STAFF_ERROR', error);
       return null;
     }
   }
@@ -56,7 +56,7 @@ class StaffAssistant {
   async addPendingRequest(userId, serverId, requestData = {}) {
     try {
       const requestId = `${userId}-${serverId}-${Date.now()}`;
-      
+
       const request = {
         id: requestId,
         userId,
@@ -69,10 +69,10 @@ class StaffAssistant {
       };
 
       this.pendingRequests.set(requestId, request);
-      errorLogger.log(`✅ Added pending partnership request: ${requestId}`, 'STAFF_ASSISTANT');
+      errorLogger.logInfo(`✅ Added pending partnership request: ${requestId}`, 'STAFF_ASSISTANT');
       return request;
     } catch (error) {
-      errorLogger.error(`❌ Error adding pending request`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error adding pending request`, 'STAFF_ERROR', error);
       throw error;
     }
   }
@@ -101,10 +101,10 @@ class StaffAssistant {
       this.pendingRequests.delete(requestId);
       this.approvedPartners.set(requestId, request);
 
-      errorLogger.log(`✅ Approved partnership request: ${requestId}`, 'STAFF_ASSISTANT');
+      errorLogger.logInfo(`✅ Approved partnership request: ${requestId}`, 'STAFF_ASSISTANT');
       return request;
     } catch (error) {
-      errorLogger.error(`❌ Error approving request`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error approving request`, 'STAFF_ERROR', error);
       throw error;
     }
   }
@@ -123,10 +123,10 @@ class StaffAssistant {
 
       this.pendingRequests.delete(requestId);
 
-      errorLogger.log(`✅ Rejected partnership request: ${requestId}`, 'STAFF_ASSISTANT');
+      errorLogger.logInfo(`✅ Rejected partnership request: ${requestId}`, 'STAFF_ASSISTANT');
       return request;
     } catch (error) {
-      errorLogger.error(`❌ Error rejecting request`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error rejecting request`, 'STAFF_ERROR', error);
       throw error;
     }
   }
@@ -155,10 +155,10 @@ class StaffAssistant {
       };
 
       this.analytics = report;
-      errorLogger.log(`✅ Generated analytics report`, 'STAFF_ASSISTANT');
+      errorLogger.logInfo(`✅ Generated analytics report`, 'STAFF_ASSISTANT');
       return report;
     } catch (error) {
-      errorLogger.error(`❌ Error generating analytics`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error generating analytics`, 'STAFF_ERROR', error);
       return null;
     }
   }
@@ -168,7 +168,7 @@ class StaffAssistant {
    */
   calculateAverageCompatibility(profiles) {
     if (profiles.length === 0) return 0;
-    
+
     const sum = profiles.reduce((acc, profile) => {
       const scores = Object.values(profile.compatibilityScores);
       const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
@@ -217,10 +217,10 @@ class StaffAssistant {
         timestamp: new Date()
       };
 
-      errorLogger.log(`✅ Sent pending requests reminder to staff`, 'STAFF_ASSISTANT');
+      errorLogger.logInfo(`✅ Sent pending requests reminder to staff`, 'STAFF_ASSISTANT');
       return reminder;
     } catch (error) {
-      errorLogger.error(`❌ Error sending reminder`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error sending reminder`, 'STAFF_ERROR', error);
       return null;
     }
   }
@@ -240,7 +240,7 @@ class StaffAssistant {
         timestamp: new Date()
       };
     } catch (error) {
-      errorLogger.error(`❌ Error getting staff dashboard`, error, AIConfig.errorCodes.STAFF_ERROR);
+      errorLogger.logError('ERROR', `❌ Error getting staff dashboard`, 'STAFF_ERROR', error);
       return null;
     }
   }

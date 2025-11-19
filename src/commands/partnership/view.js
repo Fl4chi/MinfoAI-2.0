@@ -18,7 +18,7 @@ module.exports = {
     try {
       const partnershipId = interaction.options.getString('partnership-id');
 
-      const partnership = await Partnership.findOne({ id: partnershipId }).catch(err => {
+      const partnership = await Partnership.findOne({ partnershipId: partnershipId }).catch(err => {
         errorLogger.logError('ERROR', 'DB find failed', 'DB_ERROR', err);
         throw err;
       });
@@ -31,7 +31,7 @@ module.exports = {
 
       errorLogger.logInfo('INFO', `Viewing partnership: ${partnershipId}`, 'VIEWED');
 
-      const embed = CustomEmbedBuilder.info(`🔍 Partnership ${partnership.id}`,
+      const embed = CustomEmbedBuilder.info(`🔍 Partnership ${partnership.partnershipId}`,
         `**Server:** ${partnership.primaryGuild.serverName}\n` +
         `**Status:** ${partnership.status}\n` +
         `**Creata:** ${partnership.createdAt.toLocaleDateString('it-IT')}\n` +

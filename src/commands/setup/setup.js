@@ -18,137 +18,149 @@ module.exports = {
         .map(ch => ({ label: `#${ch.name}`, value: ch.id }))
         .slice(0, 25);
 
+      // Broadened role filter: exclude @everyone and managed roles if needed, but show more options
       const roles = interaction.guild.roles.cache
-        .filter(role => role.id !== interaction.guild.id && role.managed)
+        .filter(role => role.id !== interaction.guild.id) // Exclude @everyone
+        .sort((a, b) => b.position - a.position) // Sort by position
         .map(role => ({ label: role.name, value: role.id }))
-        .slice(0, 25);
+        .slice(0, 25); // Discord limit
 
       if (channels.length === 0 || roles.length === 0) {
-        errorLogger.logError('ERROR', 'Non sono stati trovati canali o ruoli disponibili per la configurazione.', 'INVALID_GUILD_CONFIG');
         return interaction.editReply({
-          content: '❌ Non sono stati trovati canali o ruoli disponibili per la configurazione.',
-          ephemeral: true
+          content: '❌ Non sono stati trovati canali o ruoli disponibili per la configurazione.'
         });
       }
 
-      // Create embed
+      // Create premium embed
       const embed = new EmbedBuilder()
-        .setColor('#2f3136')
-        .setTitle('🔧 Configura Partnership System')
-        .setDescription('Seleziona il canale dove verranno pubblicate le richieste di partnership')
+        .setColor('#00F0FF') // Cyan Neon
+        .setTitle('🚀 Configurazione MinfoAI')
+        .setDescription('Benvenuto nel pannello di configurazione. Segui i passaggi qui sotto per attivare il sistema di partnership.\n\n**Passaggi richiesti:**')
         .addFields(
-          { name: '📋 Stato Configurazione', value: 'In corso...', inline: false }
-        );
+          { name: '1️⃣ Canale Partnership', value: 'Dove verranno pubblicate le richieste.', inline: true },
+          { name: '2️⃣ Ruolo Staff', value: 'Chi può gestire le partnership.', inline: true },
+          { name: '3️⃣ Canale Logs', value: 'Dove inviare i log di sistema.', inline: true },
+          { name: 'ℹ️ Nota', value: 'Usa i menu a tendina qui sotto in ordine.', inline: false }
+        )
+        .setThumbnail(interaction.client.user.displayAvatarURL())
+        .setFooter({ text: 'MinfoAI 2.0 • Premium Partnership System' });
 
-      // Select menu per canale
+      // 1. Select menu per canale partnership
       const channelMenu = new StringSelectMenuBuilder()
         .setCustomId('partnership_channel')
-        .setPlaceholder('Seleziona il canale...')
+        .setPlaceholder('1️⃣ Seleziona Canale Partnership...')
         .addOptions(channels);
 
       const row1 = new ActionRowBuilder().addComponents(channelMenu);
 
-      // Select menu per ruolo
+      // 2. Select menu per ruolo
       const roleMenu = new StringSelectMenuBuilder()
         .setCustomId('partnership_role')
-        .setPlaceholder('Seleziona il ruolo di approvazione...')
+        .setPlaceholder('2️⃣ Seleziona Ruolo Staff...')
         .addOptions(roles);
 
       const row2 = new ActionRowBuilder().addComponents(roleMenu);
 
+      // 3. Select menu per canale logs
+      const logChannelMenu = new StringSelectMenuBuilder()
+        .setCustomId('log_channel')
+        .setPlaceholder('3️⃣ Seleziona Canale Logs...')
+        .addOptions(channels);
+
+      const row3 = new ActionRowBuilder().addComponents(logChannelMenu);
+
       const response = await interaction.editReply({
         embeds: [embed],
-        components: [row1, row2],
-        ephemeral: true
+        components: [row1, row2, row3]
       });
 
       // Raccogliere selezioni
       const collectorFilter = (i) => i.user.id === interaction.user.id;
       const collector = response.createMessageComponentCollector({ filter: collectorFilter, time: 60000 });
 
-      let selectedChannel = null;
+      let selectedPartnershipChannel = null;
       let selectedRole = null;
+      let selectedLogChannel = null;
       let selectionsCount = 0;
 
       collector.on('collect', async (i) => {
         try {
+          // Update selections
           if (i.customId === 'partnership_channel') {
-            selectedChannel = i.values[0];
-            selectionsCount++;
-            errorLogger.logInfo('INFO', `Canale selezionato: ${selectedChannel}`, 'CONFIG_CHANNEL_SELECTED');
+            selectedPartnershipChannel = i.values[0];
+            await i.deferUpdate();
           } else if (i.customId === 'partnership_role') {
             selectedRole = i.values[0];
-            selectionsCount++;
-            errorLogger.logInfo('INFO', `Ruolo selezionato: ${selectedRole}`, 'CONFIG_ROLE_SELECTED');
+            await i.deferUpdate();
+          } else if (i.customId === 'log_channel') {
+            selectedLogChannel = i.values[0];
+            await i.deferUpdate();
           }
 
-          if (selectionsCount === 2) {
-            collector.stop();
+          // Check if all 3 are selected
+          if (selectedPartnershipChannel && selectedRole && selectedLogChannel) {
+            collector.stop('completed');
+
             // Salva configurazione
             try {
               let guildConfig = await GuildConfig.findOne({ guildId: interaction.guildId });
+              const configData = {
+                guildId: interaction.guildId,
+                guildName: interaction.guild.name,
+                partnershipChannelId: selectedPartnershipChannel,
+                staffRoleId: selectedRole,
+                logChannelId: selectedLogChannel,
+                isConfigured: true,
+                configuredAt: new Date(),
+                configuredBy: interaction.user.id
+              };
+
               if (!guildConfig) {
-                guildConfig = new GuildConfig({
-                  guildId: interaction.guildId,
-                  partnershipChannel: selectedChannel,
-                  approvalRole: selectedRole
-                });
+                guildConfig = new GuildConfig(configData);
               } else {
-                guildConfig.partnershipChannel = selectedChannel;
-                guildConfig.approvalRole = selectedRole;
+                Object.assign(guildConfig, configData);
               }
+
               await guildConfig.save();
               errorLogger.logInfo('INFO', 'Configurazione salvata con successo', 'CONFIG_SAVED');
-              
-              await i.deferUpdate();
+
               const successEmbed = new EmbedBuilder()
                 .setColor('#43b581')
                 .setTitle('✅ Configurazione Completata')
+                .setDescription('Il sistema è pronto all\'uso!')
                 .addFields(
-                  { name: '📋 Canale Partnership', value: `<#${selectedChannel}>`, inline: false },
-                  { name: '👥 Ruolo Approvazione', value: `<@&${selectedRole}>`, inline: false }
+                  { name: '📢 Partnership', value: `<#${selectedPartnershipChannel}>`, inline: true },
+                  { name: '🛡️ Staff', value: `<@&${selectedRole}>`, inline: true },
+                  { name: '📜 Logs', value: `<#${selectedLogChannel}>`, inline: true }
                 )
                 .setTimestamp();
 
               await interaction.editReply({
                 embeds: [successEmbed],
-                components: [],
-                ephemeral: true
+                components: []
               });
             } catch (saveErr) {
-              errorLogger.logError('ERROR', 'Errore nel salvataggio della configurazione', 'PARTNERSHIP_UPDATE_FAILED', saveErr);
-              await i.deferUpdate();
-              await interaction.editReply({
-                content: '❌ Errore nel salvataggio della configurazione.',
-                components: [],
-                ephemeral: true
-              });
+              errorLogger.logError('ERROR', 'Errore nel salvataggio', 'PARTNERSHIP_UPDATE_FAILED', saveErr);
+              await interaction.editReply({ content: '❌ Errore nel salvataggio.', components: [] });
             }
-          } else {
-            await i.deferUpdate();
           }
         } catch (collectorErr) {
-          errorLogger.logError('ERROR', 'Errore nel collector del menu', 'MENU_INTERACTION_FAILED', collectorErr);
+          errorLogger.logError('ERROR', 'Errore nel collector', 'MENU_INTERACTION_FAILED', collectorErr);
         }
       });
 
-      collector.on('end', (collected) => {
-        if (collected.size === 0) {
-          errorLogger.logWarn('WARNING', 'Configurazione non completata entro il timeout', 'CONFIG_TIMEOUT');
+      collector.on('end', (collected, reason) => {
+        if (reason === 'time' && (!selectedPartnershipChannel || !selectedRole || !selectedLogChannel)) {
           interaction.editReply({
             content: '⏱️ Tempo scaduto. Configurazione annullata.',
-            components: [],
-            ephemeral: true
-          }).catch(err => errorLogger.logError('ERROR', 'Errore durante timeout handling', 'TIMEOUT_HANDLE_ERROR', err));
+            components: []
+          }).catch(() => { });
         }
       });
 
     } catch (error) {
-      errorLogger.logError('CRITICAL', 'Errore durante esecuzione comando setup', 'COMMAND_EXECUTION_FAILED', error);
-      await interaction.editReply({
-        content: '❌ Errore durante l\'esecuzione del comando.',
-        ephemeral: true
-      });
+      errorLogger.logError('CRITICAL', 'Errore setup', 'COMMAND_EXECUTION_FAILED', error);
+      await interaction.editReply({ content: '❌ Errore critico.' });
     }
   }
 };

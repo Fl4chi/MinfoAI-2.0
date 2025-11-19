@@ -18,6 +18,10 @@ const guildConfigSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  logChannelId: {
+    type: String,
+    default: null
+  },
   isConfigured: {
     type: Boolean,
     default: false

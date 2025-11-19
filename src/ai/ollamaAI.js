@@ -9,8 +9,8 @@
  * 4. Bot si connette a localhost:11434
  */
 
-const fetch = require('node-fetch');
-const errorLogger = require('../logging/errorLogger');
+// const fetch = require('node-fetch'); // Native fetch used in Node 18+
+const errorLogger = require('../utils/errorLogger');
 
 class OllamaAI {
   constructor() {
@@ -28,11 +28,11 @@ class OllamaAI {
       const response = await fetch(`${this.ollamaHost}/api/tags`, { timeout: 5000 });
       if (response.ok) {
         this.isConnected = true;
-        errorLogger.log(`✅ Ollama AI connesso su ${this.ollamaHost}`, 'OLLAMA');
+        errorLogger.logInfo(`✅ Ollama AI connesso su ${this.ollamaHost}`, 'OLLAMA');
       }
     } catch (error) {
       this.isConnected = false;
-      errorLogger.log(`⚠️ Ollama non raggiungibile - Modalità fallback attiva`, 'OLLAMA');
+      errorLogger.logWarn(`⚠️ Ollama non raggiungibile - Modalità fallback attiva`, 'OLLAMA');
     }
   }
 
@@ -64,7 +64,7 @@ class OllamaAI {
       const data = await response.json();
       return this.cleanAnalysis(data.response);
     } catch (error) {
-      errorLogger.error(`❌ Errore nell'analisi Ollama`, error, 8000);
+      errorLogger.logError('ERROR', `❌ Errore nell'analisi Ollama`, 'OLLAMA_ERROR', error);
       return this.generateFallbackAnalysis(userProfile);
     }
   }

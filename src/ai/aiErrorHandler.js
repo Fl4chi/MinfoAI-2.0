@@ -7,7 +7,7 @@ const AdvancedLogger = require('../utils/advancedLogger');
  */
 class AIErrorHandler {
   constructor() {
-        this.logger = logger;
+    this.logger = errorLogger;
     this.errorPatterns = new Map();
     this.errorHistory = [];
     this.maxHistorySize = 1000;
@@ -69,7 +69,7 @@ class AIErrorHandler {
    */
   identifyPattern(errorEntry) {
     const { code, message } = errorEntry;
-    
+
     if (this.errorPatterns.has(code)) {
       const pattern = this.errorPatterns.get(code);
       pattern.count++;
@@ -122,10 +122,10 @@ class AIErrorHandler {
   calculateSeverity(errorCode) {
     const criticalErrors = ['DB_CONNECTION_FAILED', 'DISCORD_CONNECTION_FAILED', 'UNCAUGHT_EXCEPTION'];
     if (criticalErrors.includes(errorCode)) return 'CRITICAL';
-    
+
     const highErrors = ['DB_QUERY_ERROR', 'COMMAND_EXECUTION_ERROR', 'UNHANDLED_REJECTION'];
     if (highErrors.includes(errorCode)) return 'HIGH';
-    
+
     return 'MEDIUM';
   }
 
@@ -134,7 +134,7 @@ class AIErrorHandler {
    */
   suggestAutoFix(errorEntry) {
     const { code } = errorEntry;
-    
+
     const autoFixes = {
       'DB_CONNECTION_FAILED': 'Riconnessione in corso...',
       'PARTNERSHIP_NOT_FOUND': 'Controlla l\'ID partnership fornito',
@@ -149,7 +149,7 @@ class AIErrorHandler {
    */
   recordError(errorEntry) {
     this.errorHistory.push(errorEntry);
-    
+
     // Mantieni solo gli ultimi N errori
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory.shift();

@@ -63,7 +63,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
     }
 
     // Deploy global commands (takes 1-2 hours to propagate)
-    if (process.env.DEPLOY_GLOBAL === 'true') {
+    if (!process.env.GUILD_ID || process.env.DEPLOY_GLOBAL === 'true') {
       const globalData = await rest.put(
         Routes.applicationCommands(process.env.CLIENT_ID),
         { body: commands }

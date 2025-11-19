@@ -6,7 +6,7 @@
 
 const mongoose = require('mongoose');
 const AIConfig = require('./ai.config');
-const errorLogger = require('../logging/errorLogger');
+const errorLogger = require('../utils/errorLogger');
 
 class UserProfiler {
   constructor() {
@@ -37,10 +37,10 @@ class UserProfiler {
       };
 
       this.profiles.set(user.id, profile);
-      errorLogger.log(`✅ Created profile for user: ${user.username} (${user.id})`, 'AI_PROFILER');
+      errorLogger.logInfo(`✅ Created profile for user: ${user.username} (${user.id})`, 'AI_PROFILER');
       return profile;
     } catch (error) {
-      errorLogger.error(`❌ Profile creation error for ${user.id}`, error, AIConfig.errorCodes.PROFILER_ERROR);
+      errorLogger.logError('ERROR', `❌ Profile creation error for ${user.id}`, 'PROFILER_ERROR', error);
       throw error;
     }
   }
@@ -66,7 +66,7 @@ class UserProfiler {
 
       profile.lastUpdated = new Date();
     } catch (error) {
-      errorLogger.error(`❌ Interaction logging error for ${userId}`, error, AIConfig.errorCodes.PROFILER_ERROR);
+      errorLogger.logError('ERROR', `❌ Interaction logging error for ${userId}`, 'PROFILER_ERROR', error);
     }
   }
 
@@ -89,9 +89,9 @@ class UserProfiler {
       profile.guildCount = guildIds?.length || 0;
       profile.lastUpdated = new Date();
 
-      errorLogger.log(`✅ Updated guilds for ${userId}: ${guildIds.length} servers`, 'AI_PROFILER');
+      errorLogger.logInfo(`✅ Updated guilds for ${userId}: ${guildIds.length} servers`, 'AI_PROFILER');
     } catch (error) {
-      errorLogger.error(`❌ Guild update error for ${userId}`, error, AIConfig.errorCodes.PROFILER_ERROR);
+      errorLogger.logError('ERROR', `❌ Guild update error for ${userId}`, 'PROFILER_ERROR', error);
     }
   }
 
@@ -115,7 +115,7 @@ class UserProfiler {
       score += guildMatch * weights.guildMatch;
 
       // Role Match (25%)
-      const hasCommonRoles = profile.roles.some(role => 
+      const hasCommonRoles = profile.roles.some(role =>
         partnerServer.roles?.includes(role)
       ) ? 100 : 50;
       score += hasCommonRoles * weights.roleMatch;
@@ -131,11 +131,11 @@ class UserProfiler {
 
       // Score finale (0-100)
       const finalScore = Math.round(score / Object.values(weights).reduce((a, b) => a + b, 0));
-      
+
       profile.compatibilityScores[partnerServer.id] = finalScore;
       return finalScore;
     } catch (error) {
-      errorLogger.error(`❌ Compatibility calculation error`, error, AIConfig.errorCodes.PROFILER_ERROR);
+      errorLogger.logError('ERROR', `❌ Compatibility calculation error`, 'PROFILER_ERROR', error);
       return 0;
     }
   }
@@ -173,9 +173,9 @@ class UserProfiler {
         }
       }
 
-      errorLogger.log(`✅ Cache cleanup: removed ${removedCount} old profiles`, 'AI_PROFILER');
+      errorLogger.logInfo(`✅ Cache cleanup: removed ${removedCount} old profiles`, 'AI_PROFILER');
     } catch (error) {
-      errorLogger.error(`❌ Cache cleanup error`, error, AIConfig.errorCodes.PROFILER_ERROR);
+      errorLogger.logError('ERROR', `❌ Cache cleanup error`, 'PROFILER_ERROR', error);
     }
   }
 }

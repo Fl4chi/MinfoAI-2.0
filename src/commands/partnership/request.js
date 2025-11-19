@@ -65,7 +65,7 @@ module.exports = {
       const credScore = calculateCredibility(userProfile);
 
       const partnership = new Partnership({
-        id: uuidv4(),
+        partnershipId: uuidv4(),
         status: 'pending',
         primaryGuild: {
           guildId: interaction.guildId,
@@ -88,30 +88,30 @@ module.exports = {
         throw err;
       });
 
-      errorLogger.logInfo('INFO', `Partnership created: ${partnership.id}`, 'CREATED');
-      
-    // Send notifications to staff
-    try {
-      const staffRoleId = process.env.STAFF_ROLE_ID;
-      const guild = interaction.guild;
-      await sendPartnershipNotification(interaction.client, partnership, staffRoleId, guild);
-    } catch (notifError) {
-      errorLogger.logWarn('WARN', 'Failed to send notifications', 'NOTIF_FAIL');
-    }
+      errorLogger.logInfo('INFO', `Partnership created: ${partnership.partnershipId}`, 'CREATED');
 
-          // Crea i bottoni per l'approvazione/rifiuto da parte dello staff
-    const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
-    const decisionButtons = buttonHandler.createPartnershipDecisionButtons(partnership.id);
+      // Send notifications to staff
+      try {
+        const staffRoleId = process.env.STAFF_ROLE_ID;
+        const guild = interaction.guild;
+        await sendPartnershipNotification(interaction.client, partnership, staffRoleId, guild);
+      } catch (notifError) {
+        errorLogger.logWarn('WARN', 'Failed to send notifications', 'NOTIF_FAIL');
+      }
+
+      // Crea i bottoni per l'approvazione/rifiuto da parte dello staff
+      const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
+      const decisionButtons = buttonHandler.createPartnershipDecisionButtons(partnership.partnershipId);
 
       const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata',
         `Partnership per **${serverName}** inviata!\n\n` +
-        `**ID:** \`${partnership.id}\`\n` +
+        `**ID:** \`${partnership.partnershipId}\`\n` +
         `**Profilo AI:** ${aiAnalysis}\n` +
         `**Credibilità:** ${'⭐'.repeat(Math.ceil(credScore / 20))} (${credScore}%)\n` +
         `**Status:** In attesa`);
 
-      await interaction.editReply({ embeds: [embed] , components: [decisionButtons] });
-    client.advancedLogger?.partnership(`Partnership request sent: ${partnership.id}`, `Buttons displayed for staff approval`)
+      await interaction.editReply({ embeds: [embed], components: [decisionButtons] });
+      interaction.client.advancedLogger?.partnership(`Partnership request sent: ${partnership.partnershipId}`, `Buttons displayed for staff approval`)
       errorLogger.logInfo('INFO', `Request sent`, 'SENT');
 
     } catch (error) {

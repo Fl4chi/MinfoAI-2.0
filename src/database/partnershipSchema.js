@@ -10,7 +10,7 @@ const partnershipSchema = new mongoose.Schema({
     unique: true,
     index: true
   },
-  
+
   // Primary Partner Info
   primaryGuild: {
     guildId: String,
@@ -22,7 +22,7 @@ const partnershipSchema = new mongoose.Schema({
     description: String,
     inviteLink: String
   },
-  
+
   // Secondary Partner Info
   secondaryGuild: {
     guildId: String,
@@ -34,7 +34,7 @@ const partnershipSchema = new mongoose.Schema({
     description: String,
     inviteLink: String
   },
-  
+
   // Partnership Status
   status: {
     type: String,
@@ -42,21 +42,21 @@ const partnershipSchema = new mongoose.Schema({
     default: 'pending',
     index: true
   },
-  
+
   // Tier System
   tier: {
     type: String,
     enum: ['bronze', 'silver', 'gold', 'platinum'],
     default: 'bronze'
   },
-  
+
   // Partnership Features
   features: {
     enabled: Boolean,
     type: [String], // e.g., ['cross_promotion', 'ban_sharing', 'shared_events', 'exclusive_perks']
     default: ['cross_promotion']
   },
-  
+
   // Ban List Sharing
   banListSharing: {
     enabled: {
@@ -78,7 +78,7 @@ const partnershipSchema = new mongoose.Schema({
       default: 0
     }
   },
-  
+
   // Partnership Perks
   perks: {
     xpBonus: {
@@ -93,7 +93,7 @@ const partnershipSchema = new mongoose.Schema({
     specialBadge: String,
     customPrefix: String
   },
-  
+
   // Analytics
   analytics: {
     totalReferrals: {
@@ -114,7 +114,7 @@ const partnershipSchema = new mongoose.Schema({
     },
     lastInteraction: Date
   },
-  
+
   // Partnership Duration
   startedAt: {
     type: Date,
@@ -123,7 +123,7 @@ const partnershipSchema = new mongoose.Schema({
   },
   expiresAt: Date,
   renewedAt: Date,
-  
+
   // Moderation & Trust
   trustScore: {
     type: Number,
@@ -144,7 +144,7 @@ const partnershipSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  
+
   // Partnership Agreement
   agreement: {
     accepted: Boolean,
@@ -153,7 +153,7 @@ const partnershipSchema = new mongoose.Schema({
     termsVersion: String,
     customTerms: String
   },
-  
+
   // Partner Network
   networkConnections: [
     {
@@ -162,7 +162,7 @@ const partnershipSchema = new mongoose.Schema({
       connectedAt: Date
     }
   ],
-  
+
   // Custom Branding
   branding: {
     partnershipBanner: String,
@@ -172,13 +172,24 @@ const partnershipSchema = new mongoose.Schema({
     },
     customMessage: String
   },
-  
+
   // Notes & Admin
   adminNotes: String,
   requestedBy: String,
   approvedBy: String,
+  rejectedBy: String,
   rejectionReason: String,
-  
+  aiRejectionFeedback: String,
+  rejectedAt: Date,
+
+  // AI Analysis
+  aiAnalysis: {
+    userProfile: mongoose.Schema.Types.Mixed,
+    credibilityScore: Number,
+    approvalAnalysis: mongoose.Schema.Types.Mixed,
+    timestamp: Date
+  },
+
   // Metadata
   createdAt: {
     type: Date,

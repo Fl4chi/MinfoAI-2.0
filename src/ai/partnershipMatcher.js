@@ -6,7 +6,7 @@
 
 const AIConfig = require('./ai.config');
 const userProfiler = require('./userProfiler');
-const errorLogger = require('../logging/errorLogger');
+const errorLogger = require('../utils/errorLogger');
 
 class PartnershipMatcher {
   constructor() {
@@ -35,10 +35,10 @@ class PartnershipMatcher {
       };
 
       this.partnerServers.set(serverId, partner);
-      errorLogger.log(`✅ Registered partner server: ${partner.name} (${serverId})`, 'AI_MATCHER');
+      errorLogger.logInfo(`✅ Registered partner server: ${partner.name} (${serverId})`, 'AI_MATCHER');
       return partner;
     } catch (error) {
-      errorLogger.error(`❌ Partner registration error`, error, AIConfig.errorCodes.MATCHER_ERROR);
+      errorLogger.logError('ERROR', `❌ Partner registration error`, 'MATCHER_ERROR', error);
       throw error;
     }
   }
@@ -49,7 +49,7 @@ class PartnershipMatcher {
   calculateActivityLevel(serverData) {
     const memberCount = serverData.memberCount || 0;
     const messageRate = serverData.messageRate || 0;
-    
+
     if (memberCount > 1000 && messageRate > 100) return 'very-high';
     if (memberCount > 500 && messageRate > 50) return 'high';
     if (memberCount > 100 && messageRate > 10) return 'medium';
@@ -64,7 +64,7 @@ class PartnershipMatcher {
     try {
       const userProfile = userProfiler.getProfile(userId);
       if (!userProfile) {
-        errorLogger.log(`⚠️ No profile found for user ${userId}`, 'AI_MATCHER');
+        errorLogger.logWarn(`⚠️ No profile found for user ${userId}`, 'AI_MATCHER');
         return [];
       }
 
@@ -106,10 +106,10 @@ class PartnershipMatcher {
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 ore
       });
 
-      errorLogger.log(`✅ Generated ${topRecommendations.length} recommendations for ${userId}`, 'AI_MATCHER');
+      errorLogger.logInfo(`✅ Generated ${topRecommendations.length} recommendations for ${userId}`, 'AI_MATCHER');
       return topRecommendations;
     } catch (error) {
-      errorLogger.error(`❌ Recommendation generation error`, error, AIConfig.errorCodes.MATCHER_ERROR);
+      errorLogger.logError('ERROR', `❌ Recommendation generation error`, 'MATCHER_ERROR', error);
       return [];
     }
   }
@@ -144,7 +144,7 @@ class PartnershipMatcher {
       reasons.push('Buon match con il tuo profilo');
     }
 
-    return reasons.length > 0 
+    return reasons.length > 0
       ? reasons.join(' • ')
       : `Partnership score: ${score}%`;
   }
@@ -164,7 +164,7 @@ class PartnershipMatcher {
       // Altrimenti genera nuove raccomandazioni
       return await this.generateRecommendations(userId);
     } catch (error) {
-      errorLogger.error(`❌ Error getting recommendations`, error, AIConfig.errorCodes.MATCHER_ERROR);
+      errorLogger.logError('ERROR', `❌ Error getting recommendations`, 'MATCHER_ERROR', error);
       return [];
     }
   }
@@ -182,9 +182,9 @@ class PartnershipMatcher {
   async removePartnerServer(serverId) {
     try {
       this.partnerServers.delete(serverId);
-      errorLogger.log(`✅ Removed partner server: ${serverId}`, 'AI_MATCHER');
+      errorLogger.logInfo(`✅ Removed partner server: ${serverId}`, 'AI_MATCHER');
     } catch (error) {
-      errorLogger.error(`❌ Error removing partner server`, error, AIConfig.errorCodes.MATCHER_ERROR);
+      errorLogger.logError('ERROR', `❌ Error removing partner server`, 'MATCHER_ERROR', error);
     }
   }
 

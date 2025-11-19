@@ -62,13 +62,7 @@ class InteractionHandler {
       } else {
         console.error(chalk.red(`[BUTTON INTERACTION ERROR] ${error.message}`));
       }
-      
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Si è verificato un errore.',
-          ephemeral: true
-        }).catch(() => {});
-      }
+      // Do not auto-reply on error if already handled
     }
   }
 
@@ -87,25 +81,13 @@ class InteractionHandler {
       // Se esiste un handler personalizzato
       if (this.handlers.selectMenu && typeof this.handlers.selectMenu === 'function') {
         await this.handlers.selectMenu(interaction);
-      } else {
-        await interaction.deferReply({ ephemeral: true });
-        await interaction.editReply({
-          content: '📋 Opzione selezionata. Elaborazione in corso...',
-          ephemeral: true
-        });
       }
+      // REMOVED DEFAULT REPLY to allow local collectors to work
     } catch (error) {
       if (this.logger) {
         this.logger.error(`[SELECT MENU ERROR] ${error.message}`);
       } else {
         console.error(chalk.red(`[SELECT MENU ERROR] ${error.message}`));
-      }
-      
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Errore nell\'elaborazione della selezione.',
-          ephemeral: true
-        }).catch(() => {});
       }
     }
   }
@@ -125,25 +107,13 @@ class InteractionHandler {
       // Se esiste un handler personalizzato
       if (this.handlers.modal && typeof this.handlers.modal === 'function') {
         await this.handlers.modal(interaction);
-      } else {
-        await interaction.deferReply({ ephemeral: true });
-        await interaction.editReply({
-          content: '✓ Form ricevuto. Elaborazione in corso...',
-          ephemeral: true
-        });
       }
+      // REMOVED DEFAULT REPLY to allow local collectors to work
     } catch (error) {
       if (this.logger) {
         this.logger.error(`[MODAL ERROR] ${error.message}`);
       } else {
         console.error(chalk.red(`[MODAL ERROR] ${error.message}`));
-      }
-      
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Errore nell\'elaborazione del form.',
-          ephemeral: true
-        }).catch(() => {});
       }
     }
   }
@@ -158,7 +128,7 @@ class InteractionHandler {
       this.handlers.buttonActions = {};
     }
     this.handlers.buttonActions[action] = handler;
-    
+
     if (this.logger) {
       this.logger.info(`[HANDLER REGISTERED] Button handler for action: ${action}`);
     }
@@ -170,7 +140,7 @@ class InteractionHandler {
    */
   registerSelectMenuHandler(handler) {
     this.handlers.selectMenu = handler;
-    
+
     if (this.logger) {
       this.logger.info(`[HANDLER REGISTERED] Select menu handler registered`);
     }
@@ -182,7 +152,7 @@ class InteractionHandler {
    */
   registerModalHandler(handler) {
     this.handlers.modal = handler;
-    
+
     if (this.logger) {
       this.logger.info(`[HANDLER REGISTERED] Modal handler registered`);
     }
