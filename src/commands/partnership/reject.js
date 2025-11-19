@@ -3,6 +3,7 @@ const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
 const ollamaAI = require('../../ai/ollamaAI');
+const ButtonHandler = require('../../utils/buttonHandler');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -32,7 +33,7 @@ module.exports = {
       if (!partnership) {
         errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'NOT_FOUND');
         const embed = CustomEmbedBuilder.error('❌ Non Trovata', 'Partnership non trovata');
-        return interaction.editReply({ embeds: [embed] });
+        return interaction.editReply({ embeds: [embed], components: [rejectButtons] });
       }
 
       // AI: Genera feedback intelligente per il motivo
@@ -54,20 +55,25 @@ module.exports = {
       });
 
       errorLogger.logInfo('INFO', `Partnership rejected: ${partnershipId}`, 'REJECTED');
+      			client.advancedLogger?.partnership(`Partnership rejected: ${partnership.id}`, `Rejection buttons displayed for staff confirmation`)
 
       const embed = CustomEmbedBuilder.error('❌ Partnership Rifiutata',
         `**ID:** \`${partnership.id}\`\n` +
         `**Motivo:** ${reason}\n` +
         `**AI Feedback:** ${aiReason}\n` +
         `**Status:** Rifiutata`);
+      
+		// Crea i bottoni per il rifiuto/azione da parte dello staff
+		const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
+		const rejectButtons = buttonHandler.createPartnershipRejectButtons(partnership.id);
 
-      await interaction.editReply({ embeds: [embed] });
+      await interaction.editReply({ embeds: [embed], components: [rejectButtons] });
 
     } catch (error) {
       errorLogger.logError('ERROR', 'Reject failed', 'FAILED', error);
       const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nel rifiuto');
       try {
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed], components: [rejectButtons] });
       } catch (e) {
         errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
       }
