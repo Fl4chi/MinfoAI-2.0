@@ -781,4 +781,53 @@ Errore di connessione → Verifica MONGODB_URI nel .env
 
 ---
 
+## 📊 Sistema di Logging Avanzato (FASE 5)
+
+Il bot è dotato di un sistema di logging completo e bidirezionale:
+
+### Logging su Console (Terminale)
+- Registra tutti gli eventi del bot in tempo reale
+- Inclusi: comandi, errori, partnership, interazioni
+- Formato: timestamp, livello, messaggio, dettagli
+
+### Logging su Discord
+- I log vengono inviati in un canale Discord dedicato
+- Visualizzazione: embed colorati e ben formattati
+- Traccia: richieste partnership, approvazioni, rifiuti, errori
+- Statistiche: numero di partnership, tassi di conversione
+
+### Logger per Partnership
+- Evento creazione partnership request
+- Evento approvazione partnership
+- Evento rifiuto partnership  
+- Statistiche aggiornate in tempo reale
+
+---
+
+## 🎯 Interazioni tramite Bottoni (FASE 5)
+
+I comandi partnership utilizzano bottoni Discord per semplificare l'interazione:
+
+### Partnership Request
+- Lo staff riceve una richiesta con bottoni di approvazione/rifiuto
+- Clicca il bottone "Approva" per accettare
+- Clicca il bottone "Rifiuta" con opzione motivo
+- Log automatico di ogni azione
+
+### Partnership Approve/Reject
+- Comandi intuitivi con bottoni di conferma
+- Ogni azione viene loggata su console e Discord
+- Feedback immediato all'utente
+
+---
+
+## 🔧 Integrazione del Sistema di Errori
+
+Tutti gli errori sono tracciati nei due sistemi di logging:
+- **Console**: stack trace completo per debug
+- **Discord**: errore formattato per facilità di lettura
+- Classificazione: errori DB, errori permessi, errori generici
+
+---
+
 **✨ Congratulazioni! Il tuo bot MinfoAI è pronto!** 🎉
