@@ -4,6 +4,7 @@ const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
 const ollamaAI = require('../../ai/ollamaAI');
 const userProfiler = require('../../ai/userProfiler');
+const ButtonHandler = require('../../utils/buttonHandler');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,7 +29,7 @@ module.exports = {
       if (!partnership) {
         errorLogger.logWarn('WARNING', `Partnership not found: ${partnershipId}`, 'NOT_FOUND');
         const embed = CustomEmbedBuilder.error('❌ Non Trovata', 'Partnership non trovata o già elaborata');
-        return interaction.editReply({ embeds: [embed] });
+        return interaction.editReply({ embeds: [embed], components: [actionButtons] });
       }
 
       // AI: Analizza partnership per approval insight
@@ -60,14 +61,19 @@ module.exports = {
         `**AI Analysis:** ${aiAnalysis}\n` +
         `**Status:** Attiva`);
 
-      await interaction.editReply({ embeds: [embed] });
+      
+		// Crea i bottoni per la conferma/azione da parte dello staff
+		const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
+		const actionButtons = buttonHandler.createPartnershipActionButtons(partnership.id);
+      await interaction.editReply({ embeds: [embed], components: [actionButtons] });
       errorLogger.logInfo('INFO', `Approval confirmed to ${partnership.primaryGuild.userId}`, 'CONFIRMED');
+      			client.advancedLogger?.partnership(`Partnership approval sent: ${partnership.id}`, `Action buttons displayed for staff confirmation`)
 
     } catch (error) {
       errorLogger.logError('ERROR', 'Approve command failed', 'FAILED', error);
       const embed = CustomEmbedBuilder.error('❌ Errore', 'Errore nell\'approvazione');
       try {
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed], components: [actionButtons] });
       } catch (e) {
         errorLogger.logError('ERROR', 'Reply error', 'REPLY_ERROR', e);
       }
