@@ -6,6 +6,7 @@ const ollamaAI = require('../../ai/ollamaAI');
 const userProfiler = require('../../ai/userProfiler');
 const { v4: uuidv4 } = require('uuid');
 const { sendPartnershipNotification } = require('../../handlers/notificationHandler');
+const ButtonHandler = require('../../utils/buttonHandler');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -98,6 +99,10 @@ module.exports = {
       errorLogger.logWarn('WARN', 'Failed to send notifications', 'NOTIF_FAIL');
     }
 
+          // Crea i bottoni per l'approvazione/rifiuto da parte dello staff
+    const buttonHandler = new ButtonHandler(interaction.client.advancedLogger);
+    const decisionButtons = buttonHandler.createPartnershipDecisionButtons(partnership.id);
+
       const embed = CustomEmbedBuilder.success('✅ Richiesta Inviata',
         `Partnership per **${serverName}** inviata!\n\n` +
         `**ID:** \`${partnership.id}\`\n` +
@@ -105,7 +110,8 @@ module.exports = {
         `**Credibilità:** ${'⭐'.repeat(Math.ceil(credScore / 20))} (${credScore}%)\n` +
         `**Status:** In attesa`);
 
-      await interaction.editReply({ embeds: [embed] });
+      await interaction.editReply({ embeds: [embed] , components: [decisionButtons] });
+    client.advancedLogger?.partnership(`Partnership request sent: ${partnership.id}`, `Buttons displayed for staff approval`)
       errorLogger.logInfo('INFO', `Request sent`, 'SENT');
 
     } catch (error) {
