@@ -31,8 +31,8 @@ module.exports = {
             if (!global.aiHelpCooldowns) global.aiHelpCooldowns = new Map();
 
             const userCooldown = global.aiHelpCooldowns.get(userId);
-            if (userCooldown && now - userCooldown < 30000) {
-                const timeLeft = Math.ceil((30000 - (now - userCooldown)) / 1000);
+            if (userCooldown && now - userCooldown < 5000) {
+                const timeLeft = Math.ceil((5000 - (now - userCooldown)) / 1000);
                 return interaction.editReply(`⏱️ Attendi ${timeLeft} secondi prima di fare un'altra domanda.`);
             }
 

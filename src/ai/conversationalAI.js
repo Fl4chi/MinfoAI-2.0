@@ -1,5 +1,5 @@
 /**
- * Conversational AI Module - Solo risposte italiane pre-programmate
+ * Conversational AI Module - Risposte italiane naturali e specifiche
  */
 
 const errorLogger = require('../utils/errorLogger');
@@ -11,71 +11,86 @@ class ConversationalAI {
             return this.getFallbackResponse(question, context, category);
         } catch (error) {
             errorLogger.logError('ERROR', 'Errore conversational AI', 'CONV_AI_ERROR', error);
-            return '🤖 Problema temporaneo. Riprova tra qualche secondo.';
+            return 'Mi dispiace, c\'è stato un problemino tecnico. Riprova tra un attimo!';
         }
     }
 
     categorizeQuestion(question) {
         const q = question.toLowerCase();
 
-        if (q.includes('minfoai') || q.includes('bot') || q.includes('cosa fa') || q.includes('cosa puo')) return 'bot_info';
-        if (q.includes('approv') || q.includes('rifiut')) return 'partnership_approval';
-        if (q.includes('tier')) return 'tier_system';
-        if (q.includes('errore') || q.includes('problema')) return 'troubleshooting';
-        if (q.includes('miglior') || q.includes('cresce')) return 'server_improvement';
-        /**
-         * Conversational AI Module - Solo risposte italiane pre-programmate
-         */
+        // Domande specifiche sul bot
+        if (q.includes('minfoai') || q.includes('cosa fa') || q.includes('cosa puo') || q.includes('che bot')) return 'bot_info';
 
-        const errorLogger = require('../utils/errorLogger');
+        // Partnership - approvazione
+        if (q.includes('approv') || q.includes('accetta') || q.includes('requisiti')) return 'partnership_approval';
+        if (q.includes('rifiut') || q.includes('reject')) return 'partnership_reject';
 
-        class ConversationalAI {
-            async askQuestion(question, context = {}) {
-                try {
-                    const category = this.categorizeQuestion(question);
-                    return this.getFallbackResponse(question, context, category);
-                } catch (error) {
-                    errorLogger.logError('ERROR', 'Errore conversational AI', 'CONV_AI_ERROR', error);
-                    return '🤖 Problema temporaneo. Riprova tra qualche secondo.';
-                }
-            }
+        // Partnership - gestione
+        if (q.includes('creare partnership') || q.includes('fare partnership')) return 'create_partnership';
+        if (q.includes('veder') && q.includes('partnership')) return 'view_partnerships';
 
-            categorizeQuestion(question) {
-                const q = question.toLowerCase();
+        // Comandi
+        if (q.includes('comando') || q.includes('come uso') || q.includes('come si usa')) return 'commands';
+        if (q.includes('/setup') || q.includes('configurare') || q.includes('configurazione')) return 'setup_help';
 
-                if (q.includes('minfoai') || q.includes('bot') || q.includes('cosa fa') || q.includes('cosa puo')) return 'bot_info';
-                if (q.includes('approv') || q.includes('rifiut')) return 'partnership_approval';
-                if (q.includes('tier')) return 'tier_system';
-                if (q.includes('errore') || q.includes('problema')) return 'troubleshooting';
-                if (q.includes('miglior') || q.includes('cresce')) return 'server_improvement';
-                if (q.includes('trust') || q.includes('score')) return 'trust_score';
+        // Tier system
+        if (q.includes('tier') || q.includes('livello') || q.includes('bronze') || q.includes('silver') || q.includes('gold') || q.includes('platinum')) return 'tier_system';
 
-                return 'general';
-            }
+        // Trust score
+        if (q.includes('trust') || q.includes('score') || q.includes('punteggio') || q.includes('reputazione')) return 'trust_score';
 
-            getFallbackResponse(question, context, category) {
-                const responses = {
-                    bot_info: `Ciao! Sono qui per aiutarti a gestire le partnership del tuo server Discord. Pensa a me come quel amico esperto che ti da una mano quando devi trovare collaborazioni serie e far crescere la community.\n\nTi faccio un esempio: mettiamo che hai un server di gaming con 400 persone e vorresti collaborare con altri server simili. Io ti aiuto a trovare quelli giusti, valutare se sono affidabili, e tenere tutto organizzato. Non dovrai più perdere tempo con richieste spam o partnership che non portano a nulla.\n\nGestisco anche un sistema di classificazione (tipo Bronze, Silver, Gold, Platinum) così puoi dare priorità alle collaborazioni più importanti. E tengo traccia di tutto quello che succede, così hai sempre sott'occhio come stanno andando le cose.\n\nSe vuoi iniziare, ti basta un attimo: usa /setup e ti mostro come configurare tutto. Davvero, sono due minuti e sei pronto!`,
+        // Crescita server
+        if (q.includes('crescere') || q.includes('migliorare') || q.includes('aumentare membri') || q.includes('far crescere')) return 'server_improvement';
 
-                    partnership_approval: `Allora guarda, se vuoi che la tua richiesta venga accettata ci sono un paio di cose da tenere a mente.\n\nIntanto il server dovrebbe avere minimo 500 persone, ma non intendo 500 account morti eh - parlo di una community vera che chatta, partecipa, si diverte. Capita spesso che arrivino richieste da server con tanti membri ma completamente inattivi, e quello non va bene.\n\nPoi quando ti presenti fa la differenza essere chiari e professionali. Tipo, invece che scrivere "bel server entra" prova con qualcosa tipo: "Server italiano dedicato al gaming competitivo, organizziamo tornei ogni weekend e abbiamo 800 membri attivi". Vedi la differenza? Così chi legge capisce subito cosa offri.\n\nAh, e il link di invito deve funzionare! Sembra banale ma ti giuro che un sacco di richieste arrivano con link scaduti o sbagliati.\n\nC'è poi il discorso del trust score: serve almeno 40 punti su 100. Buona notizia: parti già da 50, quindi sei a posto. Sale quando porti a termine partnership senza problemi, scende se ci sono casini. Praticamente funziona come il feedback di eBay,se ci pensi.\n\nQuando sei pronto usa /partnership-request, riempi tutto con calma e dovresti essere apposto!`,
+        // Trovare partner
+        if (q.includes('trovare') && (q.includes('partner') || q.includes('server'))) return 'find_partners';
 
-                    tier_system: `Il sistema dei tier è tipo i livelli dei programmi fedeltà, hai presente quelli delle compagnie aeree o delle carte fedeltà?\n\nQuando inizi sei Bronze, che è il livello base. Va benissimo per cominciare, hai accesso a tutto quello che ti serve. Poi man mano che completi partnership e accumuli esperienza, sali di livello.\n\nAl Silver prendi un 10% in più di esperienza ogni volta che completi una partnership, più un badge carino da mostrare. Al Gold sono il 25% in più di XP e un ruolo speciale che tutti vedono. E al Platinum, che è il top, prendi il 50% di bonus su tutto.\n\nFacciamo un esempio pratico: diciamo che completi una partnership che normalmente ti darebbe 100 punti esperienza. Se sei Bronze prendi 100, se sei Gold ne prendi 125, se sei Platinum ben 150. Capisci che sale veloce!\n\nPer vedere a che punto sei usa /partner-tier. Così controlli quanto ti manca per salire e puoi farti un'idea di quando raggiungerai il prossimo livello.`,
+        // Problemi tecnici
+        if (q.includes('errore') || q.includes('problema') || q.includes('non funziona') || q.includes('bug')) return 'troubleshooting';
 
-                    server_improvement: `Far crescere un server richiede tempo e strategia, ma le partnership giuste possono davvero fare la differenza.\n\nPrendiamo un caso concreto: diciamo che hai 300 membri e punti ad arrivare a 1000. Invece di spammare inviti a casaccio su altri server (che non funziona mai), trova 3-4 server che hanno un pubblico simile al tuo. Per dire, se hai un server di fotografi, cerca community di designer, artisti digitali, videomaker.. persone con interessi compatibili insomma.\n\nPoi organizza qualcosa insieme: un contest fotografico, una serata di critique, una challenge settimanale. Quando le partnership sono fatte bene entrambi i server ci guadagnano, la gente si muove, interagisce, invita amici.\n\nC'è anche /partner-match che ti può aiutare a trovare server compatibili basandosi su tanti fattori diversi, tipo tema, dimensione, lingua, tipo di community. È comodo perché ti fa risparmiare un sacco di tempo.\n\nRicorda sempre: meglio 10 partnership fatte come si deve che 100 buttate là a caso. La qualità batte sempre la quantità, fidati.`,
+        // Esempi pratici
+        if (q.includes('esempio') || q.includes('per esempio')) return 'examples';
 
-                    troubleshooting: `Capisco che quando qualcosa non va può essere frustrante. Vediamo di sistemare insieme.\n\nPrimo passo: vai su /setup e controlla che sia tutto configurato per bene. Devi scegliere il canale dove gestire le partnership, il ruolo staff, ilcanale per i log.. se è saltato qualche passaggio è normale che poi ci siano problemi.\n\nUn'altra cosa importante: i permessi. Devo avere il ruolo Administrator, oppure almeno i permessi per gestire canali, mandare messaggi, usare gli embed. Se comincio a dare errori strani, magari è solo questione di permessi.\n\nC'è poi il canale log che se l'hai impostato scrive tutto quello che succede. Praticamente è come un diario dove segno ogni cosa - errori compresi. Se vai a guardare lì probabilmente trovi scritto esattamente cosa è andato storto.\n\nSe anche dopo questi controlli continua a non funzionare, usa /partnership-report e spiega bene cosa stavi facendo quando è successo il casino. Tipo "stavo approvando una partnership e mi ha dato errore quando ho premuto conferma". Più dettagli dai, più è facile capire il problema!`,
+        return 'general';
+    }
 
-                    trust_score: `Il trust score è praticamente la tua reputazione qui dentro. ${context.trustScore ? `Il tuo al momento è ${context.trustScore} su 100` : 'Inizi da 50 su 100'}, che è un buon punto di partenza.\n\nFunziona esattamente come il rating dei venditori su eBay o le recensioni su Airbnb. Ogni volta che completi una partnership senza problemi guadagni 10 punti. Se invece ci sono casini, spam, accordi non rispettati, ne perdi tra 10 e 20 dipendendo da quanto è grave la cosa.\n\nQuesto punteggio conta parecchio per le collaborazioni future. Chi ha sopra 70 viene considerato partner affidabile premium e le sue richieste vengono guardate subito. Sotto 40 invece le richieste vengono controllate più attentamente prima di approvarle, è normale.\n\nLa cosa bella è che anche se scendi puoi sempre risalire. Basta portare a termine le partnership in modo professionale e il punteggio torna su. È meritocratico: premia chi si impegna e lavora bene nel tempo!`,
+    getFallbackResponse(question, context, category) {
+        const responses = {
+            bot_info: `Ciao! Sono qui per aiutarti a gestire le partnership del tuo server Discord. Pensa a me come quel amico esperto che ti da una mano quando devi trovare collaborazioni serie e far crescere la community.\n\nTi faccio un esempio: mettiamo che hai un server gaming con 400 persone e vorresti collaborare con altri server simili. Io ti aiuto a trovare quelli giusti, valutare se sono affidabili, e tenere tutto organizzato. Non dovrai più perdere tempo con richieste spam o partnership che non portano a nulla.\n\nGestisco anche un sistema di classificazione (tipo Bronze, Silver, Gold, Platinum) così puoi dare priorità alle collaborazioni più importanti. E tengo traccia di tutto, così hai sempre sott'occhio come stanno andando le cose.\n\nSe vuoi iniziare, usa /setup e ti mostro come configurare tutto. Sono letteralmente due minuti!`,
 
-                    general: `Ciao! Sono qui per darti una mano con le partnership e la crescita del tuo server.\n\nPosso spiegarti come funzionano i vari comandi, darti consigli strategici su come trovare i partner giusti, aiutarti a capire perché magari una richiesta non è stata approvata, o semplicemente rispondere ai tuoi dubbi.\n\nLa cosa migliore è farmi domande specifiche. Tipo invece di "come funziona il bot" chiedimi "come posso trovare server compatibili col mio" oppure "perché il mio trust score è basso". Così posso darti risposte precise basate sulla tua situazione.\n\nAltrimenti dimmi un po', cosa ti serve sapere? Che dubbio hai?`
-                };
+            partnership_approval: `Allora guarda, se vuoi che la tua richiesta venga accettata ci sono un paio di cose da tenere a mente.\n\nIntanto il server dovrebbe avere minimo 500 persone, ma non intendo 500 account morti - parlo di una community vera che chatta, partecipa, si diverte. Capita spesso che arrivino richieste da server con tanti membri ma completamente inattivi.\n\nQuando ti presenti fa la differenza essere chiari e professionali. Invece di "bel server entra" prova con: "Server italiano gaming competitivo, tornei ogni weekend, 800 membri attivi". Vedi che differenza?\n\nIl link di invito deve funzionare (sembra banale ma capita spesso!). E serve un trust score di almeno 40 punti - ma parti già da 50, quindi sei apposto.\n\nQuando sei pronto usa /partnership-request e riempi tutto con calma!`,
 
-                if (question.toLowerCase().includes('minfoai') || question.toLowerCase().includes('cosa fa') || question.toLowerCase().includes('cosa puo')) {
-                    return responses.bot_info;
-                }
+            partnership_reject: `Capisco che ricevere un rifiuto non sia piacevole, ma solitamente c'è un motivo specifico e si può sistemare.\n\nSpesso il problema è uno di questi: membri insufficienti o inattivi, descrizione troppo generica o poco chiara, link scaduto, oppure trust score sotto soglia. Se guardi la motivazione del rifiuto capisci subito cosa sistemare.\n\nLa cosa bella è che puoi riprovare dopo aver migliorato questi aspetti. Non è un no definitivo. Per esempio, se il problema era i membri, aspetta di arrivare a 500 attivi e riprova. Se era la descrizione, riscrivila in modo più professionale.\n\nSe pensi che il rifiuto sia stato un errore, puoi sempre usare /partnership-report per spiegare la situazione allo staff.`,
 
-                return responses[category] || responses.general;
-            }
+            create_partnership: `Creare una partnership è semplicissimo! Ti basta usare il comando /partnership-request e compilare i campi.\n\nEcco cosa ti chiederà: nome del tuo server, quanti membri avete, una descrizione di cosa offrite, il link di invito permanente, e una motivazione - tipo "Cerchiamo server gaming simili per organizzare tornei insieme".\n\nUn consiglio: prenditi qualche minuto per scrivere bene la descrizione. Non copiare-incollare qualcosa di generico. Spiega cosa rende il tuo server interessante, cosa fate di solito, che tipo di community siete. Questo aiuta moltissimo a trovare partnership compatibili.\n\nDopo che invii la richiesta, lo staff la esalta e se tutto è ok viene approvata. Di solito non ci vuole tanto!`,
+
+            view_partnerships: `Per vedere le partnership attive usa /partnership-list. Ti mostra tutte quelle del server con i dettagli principali.\n\nSe vuoi i dettagli specifici di una partnership usa /partnership-view seguito dall'ID. Così vedi tutto: quando è stata creata, con chi, statistiche, tier, eccetera.\n\nC'è anche /partnership-stats se ti interessano i numeri globali - tipo quante partnership hai in totale, quali sono le più attive, come sta andando in generale.`,
+
+            commands: `I comandi principali sono questi, te li spiego in modo pratico:\n\n/setup è quello da fare per primo - configura tutto il sistema. /partnership-request per chiedere nuove collaborazioni. /partnership-list per vedere quelle attive. /partner-match per trovare server compatibili.\n\nPoi ci sono quelli da staff: /partnership-approve e /partnership-reject per gestire le richieste. /partner-tier per cambiare il livello di una partnership.\n\nSe vuoi la lista completa basta che digiti / su Discord e scorri - ci sono circa 15-16 comandi in tutto. Alcuni sono per tutti, altri solo per gli admin.\n\nQuale ti interessa in particolare? Così te lo spiego meglio!`,
+
+            setup_help: `/setup è il comando che devi usare per configurare tutto la prima volta. È molto semplice, ti fa scegliere tre cose:\n\nPrimo, il canale dove gestire le partnership - di solito si crea un canale tipo #partnership-logs. Secondo, il ruolo staff che può approvare/rifiutare (tipo @Moderatori o @Admin). Terzo, un canale per i log di sistema.\n\nUna volta fatto questo il bot è pronto. Ci vogliono letteralmente due minuti. Se sbagli qualcosa puoi sempre rifare /setup e riconfigurare.\n\nSe hai problemi con i permessi, assicurati che io abbia il ruolo Administrator o almeno i permessi per gestire canali e mandare messaggi.`,
+
+            tier_system: `I tier funzionano tipo i punti fedeltà delle compagnie aeree - più sei attivo, più sali di livello.\n\nInizi Bronze (livello base, tutto funziona ma zero bonus). Poi c'è Silver che ti da +10% esperienza e un badge. Gold è +25% XP più un ruolo speciale. Platinum è il top: +50% XP e tutti i vantaggi.\n\nEsempio pratico: completi una partnership che normalmente da 100 punti. Se sei Bronze prendi 100, se sei Gold ne prendi 125, se sci Platinum ben 150. Capisci che conviene salire!\n\nPer gestire i tier usa /partner-tier. Li assegna lo staff in base all'importanza della partnership.`,
+
+            trust_score: `Il trust score è la tua reputazione qui dentro. ${context.trustScore ? `Il tuo attualmente è ${context.trustScore}/100` : 'Parti da 50/100'}, che è un buon inizio.\n\nFunziona esattamente come eBay o Airbnb: ogni partnership completata bene ti da +10 punti. Se invece ci sono problemi, spam, accordi non rispettati, ne perdi tra 10 e 20.\n\nSopra 70 sei considerato partner premium e le tue richieste hanno priorità. Sotto 40 invece vengono controllate più attentamente. La soglia minima per richiedere partnership è appunto 40.\n\nLa cosa bella? Anche se scendi puoi sempre risalire completando partnership in modo serio. È meritocratico!`,
+
+            server_improvement: `Far crescere un server richiede strategia, ma le partnership giuste accelerano tutto.\n\nCaso pratico: hai 300 membri, vuoi arrivare a 1000. Invece di spammare inviti random, trova 3-4 server con pubblico simile. Per dire, se hai un server di fotografi, cerca designer, artisti digitali, videomaker - gente con interessi compatibili.\n\nPoi organizza qualcosa insieme: contest, challenge, serate a tema. Quando entrambi i server ci guadagnano, la gente si muove, interagisce, invita amici.\n\nUsa /partner-match per trovare server compatibili in automatico. Ti fa risparmiare un sacco di tempo!\n\nRicorda: 10 partnership fatte bene valgono più di 100 buttate lì. Qualità batte quantità sempre.`,
+
+            find_partners: `Per trovare partner compatibili la cosa migliore è usare /partner-match. Questo comando analizza il tuo server (tema, dimensione, lingua, tipo di community) e trova automaticamente server simili.\n\nAltrimenti puoi guardare in /partnership-list i server che hanno già partnership attive - spesso quelli sono della tua stessa nicchia e potrebbero interessarti.\n\nUn altro modo è partecipare alle community Discord sulla tua tematica e notare quali server sono attivi e professionali. Poi contattali tramite /partnership-request.\n\nL'importante è cercare compatibilità vera, non solo numeri. Un server con 200 membri super attivi vale più di uno con 2000 morti.`,
+
+            troubleshooting: `Quando qualcosa non va, primo passo: /setup per controllare la configurazione. Verifica che canale partnership, ruolo staff e canale log siano impostati giusti.\n\nSecondo: permessi. Devo avere Administrator oppure almeno gestire canali + mandare messaggi + usare embed. Se do errori strani spesso è questione di permessi.\n\nTerzo: guarda il canale log. Scrivo lì tutti gli errori con dettagli. È tipo un diario dove segno tutto.\n\nSe continua a non andare usa /partnership-report e spiega cosa stavi facendo quando è successo. Tipo "stavo approvando una partnership e ha dato errore al click". Più dettagli = più facile capire!`,
+
+            examples: `Ti faccio qualche esempio pratico di come funziona tutto:\n\nEsempio 1: Hai un server di gaming con 600 membri. Usi /partner-match e trova 3 server simili. Mandi /partnership-request al primo, compili tutto bene, viene approvato. Boom, partnership attiva! Organizzi un torneo insieme e entrambi i server crescono.\n\nEsempio 2: Ricevi una richiesta di partnership. usi /partnership-view per vedere i dettagli. Il server sembra serio: 800 membri attivi, buona descrizione, trust score 65. Fai /partnership-approve e la partnership parte.\n\nEsempio 3: Una partnership non sta funzionando (membri inattivi, nessun evento). Usi /partnership-delete per chiuderla. Meglio chiudere quelle morte e cercarne di nuove.\n\nHai esempi specifici che ti interessano?`,
+
+            general: `Ciao! Sono qui per aiutarti con partnership e crescita del server.\n\nPuoi chiedermi cose tipo: "come faccio a creare una partnership?", "perché la mia richiesta è stata rifiutata?", "come trovo server compatibili?", "cosa significa il trust score?", o qualsiasi altra cosa ti venga in mente.\n\nPiù sei specifico nella domanda, più posso darti una risposta utile. Quindi invece di domande generiche, chiedi pure cose precise sulla tua situazione!\n\nCosa ti serve sapere?`
+        };
+
+        if (question.toLowerCase().includes('minfoai') || question.toLowerCase().includes('cosa fa') || question.toLowerCase().includes('cosa puo')) {
+            return responses.bot_info;
         }
 
-        module.exports = new ConversationalAI();
+        return responses[category] || responses.general;
+    }
+}
+
+module.exports = new ConversationalAI();
