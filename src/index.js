@@ -6,6 +6,8 @@ const logger = require('./utils/logger');
 const errorLogger = require('./utils/errorLogger');
 const commandHandler = require('./handlers/commandHandler');
 const eventHandler = require('./handlers/eventHandler');
+const AdvancedLogger = require('./utils/advancedLogger');
+const InteractionHandler = require('./handlers/interactionHandler');
 
 const client = new Client({
   intents: [
@@ -25,6 +27,14 @@ mongoose.connect(process.env.MONGODB_URI).then(async () => {
   // Carica handlers
   await commandHandler(client);
   await eventHandler(client);
+  
+// Inizializza AdvancedLogger e InteractionHandler
+const advancedLogger = new AdvancedLogger(client, process.env.LOG_CHANNEL_ID);
+const interactionHandler = new InteractionHandler(client, advancedLogger);
+
+// Registra gli handlers di log e interazione nel client
+client.advancedLogger = advancedLogger;
+client.interactionHandler = interactionHandler;
 
 }).catch(err => {
   errorLogger.logError('CRITICAL', 'Errore connessione MongoDB', 'DB_CONNECTION_FAILED', err);
