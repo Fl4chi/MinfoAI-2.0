@@ -19,7 +19,7 @@ module.exports = {
                 .setMaxLength(100)),
 
     async execute(interaction) {
-        await interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true }); // FIX: ephemeral qui, non in editReply!
 
         try {
             const question = interaction.options.getString('question');
@@ -47,11 +47,8 @@ module.exports = {
             // Chiedi all'AI
             const aiResponse = await conversationalAI.askQuestion(question, context);
 
-            // Risposta semplice e pulita (NO EMBED, EPHEMERAL)
-            await interaction.editReply({
-                content: aiResponse,
-                flags: 64 // MessageFlags.Ephemeral
-            });
+            // Risposta semplice e pulita (EPHEMERAL già settato nel deferReply)
+            await interaction.editReply(aiResponse);
 
         } catch (error) {
             errorLogger.logError('ERROR', 'Errore comando ai-help', 'AI_HELP_ERROR', error);
