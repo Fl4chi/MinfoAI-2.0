@@ -1,3 +1,4 @@
+const { MessageFlags } = require('discord.js');
 const errorLogger = require('../utils/errorLogger');
 
 module.exports = {
@@ -21,7 +22,7 @@ module.exports = {
         // Robust error handling with reply safety
         const errorMessage = {
           content: 'There was an error while executing this command!',
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         };
 
         try {
@@ -34,36 +35,7 @@ module.exports = {
           errorLogger.logError('ERROR', `Could not send error message to user: ${replyError.message}`, 'ERROR_REPLY_FAILED');
         }
       }
-      
-    // Handle button interactions for partnership notifications
-    if (interaction.isButton()) {
-      const buttonId = interaction.customId;
-      
-      // Handle partnership approval/rejection buttons
-      if (buttonId.startsWith('approve_') || buttonId.startsWith('reject_') || buttonId.startsWith('view_')) {
-        try {
-          const partnershipId = buttonId.split('_')[1];
-          errorLogger.logInfo('INFO', `Partnership button interaction: ${buttonId}`, 'BUTTON_CLICK');
-          
-          // Defer the interaction first
-          await interaction.deferReply({ ephemeral: true });
-          
-          // You can add more specific logic here for each button type
-          if (buttonId.startsWith('approve_')) {
-            await interaction.editReply({ content: '✅ Partnership approvata! Usa `/partner-approve` per completare.' });
-          } else if (buttonId.startsWith('reject_')) {
-            await interaction.editReply({ content: '❌ Usa `/partner-reject` per rifiutare con motivo.' });
-          } else if (buttonId.startsWith('view_')) {
-            await interaction.editReply({ content: '👁️ Usa `/partner-view` per visualizzare i dettagli.' });
-          }
-        } catch (buttonError) {
-          errorLogger.logError('ERROR', 'Button interaction error', 'BUTTON_ERROR', buttonError);
-          try {
-            await interaction.reply({ content: '❌ Errore nel processare il button', ephemeral: true });
-          } catch (e) { /* silent fail */ }
-        }
-      }
-    }
     }
   }
 };
+

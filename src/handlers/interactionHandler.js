@@ -43,6 +43,9 @@ class InteractionHandler {
    */
   async handleButtonInteraction(interaction) {
     try {
+      // Ignore setup buttons as they are handled by local collectors
+      if (interaction.customId.startsWith('setup_')) return;
+
       if (this.logger) {
         this.logger.info(`[INTERACTION] Button interaction received: ${interaction.customId}`);
       } else {

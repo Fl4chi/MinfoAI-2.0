@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const conversationalAI = require('../../ai/conversationalAI');
 const contextBuilder = require('../../utils/contextBuilder');
 const errorLogger = require('../../utils/errorLogger');
@@ -20,7 +20,7 @@ module.exports = {
 
     async execute(interaction) {
         const startTime = Date.now();
-        await interaction.deferReply({ ephemeral: true }); // FIX: ephemeral qui, non in editReply!
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral }); // FIX: ephemeral qui, non in editReply!
 
         try {
             const question = interaction.options.getString('question');

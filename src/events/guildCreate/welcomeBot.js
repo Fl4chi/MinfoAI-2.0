@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const GuildConfig = require('../../schemas/guildConfig');
+const GuildConfig = require('../../database/guildConfigSchema');
 
 module.exports = {
   name: 'guildCreate',
@@ -9,7 +9,7 @@ module.exports = {
 
       const welcomeEmbed = new EmbedBuilder()
         .setColor(0x5865F2)
-        .setTitle('Benvenuto su MinfoAI 2.0')
+        .setTitle('Benvenuto in MinfoAI!')
         .setDescription('Grazie per aver aggiunto MinfoAI al tuo server!')
         .addFields(
           { name: 'Bot Partnership Manager', value: 'Gestisci le partnership in modo semplice e intuitivo', inline: false },
@@ -29,13 +29,11 @@ module.exports = {
         embeds: [welcomeEmbed],
         components: [setupButton],
       }).catch(() => {
-        guild.client.advancedLogger?.warn(`Could not send DM to ${guild.name} owner`, 'DM failed');
+        // Silent fail if DM closed
       });
 
-      guild.client.advancedLogger?.info(`Bot joined guild: ${guild.name}`, `Owner: ${owner.user.tag}`);
-
     } catch (error) {
-      guild.client.advancedLogger?.error(`Guild create event error: ${error.message}`, error.stack);
+      console.error(`Guild create event error: ${error.message}`);
     }
   },
 };

@@ -1,20 +1,19 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require('discord.js');
 const chalk = require('chalk');
+const Partnership = require('../database/partnershipSchema');
+const GuildConfig = require('../database/guildConfigSchema');
+const UserEconomy = require('../database/userEconomySchema');
+const CustomEmbedBuilder = require('./embedBuilder');
 
 /**
  * ButtonHandler - Gestisce la creazione e il routing dei bottoni per le partnership
- * Supporta: Approve, Reject, View Details, Cancel
+ * Supporta: Approve, Reject, View Details, Cancel, Shop
  */
 class ButtonHandler {
   constructor(advancedLogger = null) {
     this.logger = advancedLogger;
   }
 
-  /**
-   * Crea una riga di bottoni per l'approvazione/rifiuto di una partnership
-   * @param {string} partnerId - ID della partnership
-   * @returns {ActionRowBuilder} Riga con bottoni approve/reject/view
-   */
   createPartnershipDecisionButtons(partnerId) {
     const row = new ActionRowBuilder()
       .addComponents(
@@ -34,11 +33,6 @@ class ButtonHandler {
     return row;
   }
 
-  /**
-   * Crea bottoni per la conferma di azioni
-   * @param {string} actionId - ID dell'azione
-   * @returns {ActionRowBuilder} Riga con bottoni confirm/cancel
-   */
   createConfirmationButtons(actionId) {
     const row = new ActionRowBuilder()
       .addComponents(
@@ -54,35 +48,23 @@ class ButtonHandler {
     return row;
   }
 
-  /**
-   * Crea bottoni per le azioni di gestione partnership
-   * @param {string} partnerId - ID della partnership
-   * @returns {ActionRowBuilder} Riga con bottoni manage/edit/remove
-   */
-  createManagementButtons(partnerId) {
+  createPartnershipActionButtons(partnerId) {
     const row = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
-          .setCustomId(`edit_${partnerId}`)
-          .setLabel('✏️ Modifica')
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          .setCustomId(`stats_${partnerId}`)
-          .setLabel('📈 Statistiche')
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          .setCustomId(`remove_${partnerId}`)
-          .setLabel('🗑️ Rimuovi')
+          .setCustomId(`delete_${partnerId}`)
+          .setLabel('🗑️ Elimina')
           .setStyle(ButtonStyle.Danger)
       );
     return row;
   }
 
-  /**
-   * Estrae l'azione e l'ID dal customId del bottone
-   * @param {string} customId - ID personalizzato del bottone (es: "approve_123")
-   * @returns {object} Oggetto {action, id}
-   */
+  createPartnershipRejectButtons(partnerId) {
+    return new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`view_${partnerId}`).setLabel('📋 Dettagli').setStyle(ButtonStyle.Secondary)
+    );
+  }
+
   parseButtonId(customId) {
     const parts = customId.split('_');
     const action = parts[0];
@@ -90,82 +72,142 @@ class ButtonHandler {
     return { action, id };
   }
 
-  /**
-   * Gestisce l'interazione con un bottone
-   * @param {ButtonInteraction} interaction - Interazione del bottone
-   * @param {object} handlers - Oggetto con funzioni handler per ogni azione
-   */
   async handleButtonInteraction(interaction, handlers = {}) {
     try {
       const { action, id } = this.parseButtonId(interaction.customId);
-      
+
       if (this.logger) {
         this.logger.info(`[BUTTON] Bottone cliccato: ${action} | Partner ID: ${id} | Utente: ${interaction.user.tag}`);
-      } else {
-        console.log(chalk.blue(`[BUTTON] ${action.toUpperCase()} | ID: ${id} | User: ${interaction.user.tag}`));
       }
 
-      // Defer la risposta per evitare timeout
-      await interaction.deferReply({ ephemeral: true });
+      // Defer la risposta
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
       // Chiama l'handler specifico se esiste
       if (handlers[action] && typeof handlers[action] === 'function') {
         await handlers[action](interaction, id);
       } else {
-        // Handler di default
+        // Handler di default con logica reale
         await this.defaultButtonHandler(interaction, action, id);
       }
     } catch (error) {
-      if (this.logger) {
-        this.logger.error(`[BUTTON ERROR] ${error.message}`);
-      } else {
-        console.error(chalk.red(`[BUTTON ERROR] ${error.message}`));
-      }
-      
+      console.error(chalk.red(`[BUTTON ERROR] ${error.message}`));
       if (!interaction.replied) {
         await interaction.editReply({
-          content: '❌ Si è verificato un errore durante l\'elaborazione del bottone.',
-          ephemeral: true
-        }).catch(() => {});
+          content: '❌ Si è verificato un errore durante l\'elaborazione del bottone.'
+        }).catch(() => { });
       }
     }
   }
 
-  /**
-   * Handler di default per i bottoni (fallback)
-   * @param {ButtonInteraction} interaction
-   * @param {string} action
-   * @param {string} id
-   */
   async defaultButtonHandler(interaction, action, id) {
-    const messages = {
-      approve: '✅ Partnership approvata con successo!',
-      reject: '❌ Partnership rifiutata.',
-      view: '📋 Caricamento dettagli partnership...',
-      confirm: '✓ Azione confermata.',
-      cancel: '✗ Azione annullata.',
-      edit: '✏️ Modifica partnership avviata...',
-      stats: '📈 Statistiche partnership caricate...',
-      remove: '🗑️ Partnership rimossa.'
-    };
+    try {
+      if (action === 'approve') {
+        const partnership = await Partnership.findOne({ partnershipId: id });
+        if (!partnership) return interaction.editReply('❌ Partnership non trovata.');
 
-    const message = messages[action] || `Azione: ${action}`;
-    await interaction.editReply({ content: message, ephemeral: true });
-  }
+        if (partnership.status === 'active') return interaction.editReply('⚠️ Partnership già attiva.');
 
-  /**
-   * Raccoglie bottoni multipli in una singola riga
-   * @param {array} buttons - Array di ButtonBuilder
-   * @returns {ActionRowBuilder}
-   */
-  createCustomRow(buttons = []) {
-    const row = new ActionRowBuilder();
-    buttons.forEach(btn => {
-      if (btn instanceof ButtonBuilder) {
-        row.addComponents(btn);
+        partnership.status = 'active';
+        partnership.approvedBy = interaction.user.id;
+        partnership.approvedAt = new Date();
+        await partnership.save();
+
+        const embed = CustomEmbedBuilder.success('✅ Partnership Approvata', `La partnership con **${partnership.primaryGuild.serverName}** è ora attiva.`);
+        await interaction.editReply({ embeds: [embed] });
       }
-    });
-    return row;
+      else if (action === 'reject') {
+        const partnership = await Partnership.findOne({ partnershipId: id });
+        if (!partnership) return interaction.editReply('❌ Partnership non trovata.');
+
+        partnership.status = 'rejected';
+        partnership.rejectedBy = interaction.user.id;
+        partnership.rejectedAt = new Date();
+        await partnership.save();
+
+        const embed = CustomEmbedBuilder.error('❌ Partnership Rifiutata', `La partnership con **${partnership.primaryGuild.serverName}** è stata rifiutata.`);
+        await interaction.editReply({ embeds: [embed] });
+      }
+      else if (action === 'view') {
+        const partnership = await Partnership.findOne({ partnershipId: id });
+        if (!partnership) return interaction.editReply('❌ Partnership non trovata.');
+
+        const embed = CustomEmbedBuilder.info(`🔍 Dettagli Partnership`,
+          `**Server:** ${partnership.primaryGuild.serverName}\n` +
+          `**ID:** \`${partnership.partnershipId}\`\n` +
+          `**Status:** ${partnership.status}\n` +
+          `**Descrizione:** ${partnership.primaryGuild.description}`);
+
+        await interaction.editReply({ embeds: [embed] });
+      }
+      else if (action === 'delete') {
+        await Partnership.findOneAndDelete({ partnershipId: id });
+        await interaction.editReply('🗑️ Partnership eliminata dal database.');
+      }
+      else if (action === 'shop') {
+        // Format: shop_buy_boost_3d
+        const subAction = id.split('_')[1]; // boost, reset
+        const variant = id.split('_')[2]; // 3d, 1d, etc.
+
+        const guildConfig = await GuildConfig.findOne({ guildId: interaction.guildId });
+        if (!guildConfig) return interaction.editReply('❌ Configurazione server non trovata.');
+
+        // Costi
+        const costs = {
+          'boost_3d': 500,
+          'boost_1d': 200,
+          'reset': 500
+        };
+
+        const itemKey = variant ? `${subAction}_${variant}` : subAction;
+        const cost = costs[itemKey];
+
+        if (!cost) return interaction.editReply('❌ Oggetto non riconosciuto.');
+
+        // Check Balance
+        let userEco = await UserEconomy.findOne({ userId: interaction.user.id });
+        if (!userEco || userEco.balance < cost) {
+          return interaction.editReply(`❌ **Fondi Insufficienti!** Hai solo ${userEco ? userEco.balance : 0} Coins.`);
+        }
+
+        // Deduct Coins
+        userEco.balance -= cost;
+        userEco.transactions.push({
+          type: 'SPEND',
+          amount: cost,
+          reason: `Shop: ${itemKey}`
+        });
+        await userEco.save();
+
+        // Apply Effect
+        if (subAction === 'boost') {
+          const durationDays = variant === '3d' ? 3 : 1;
+          const durationMs = durationDays * 24 * 60 * 60 * 1000;
+
+          guildConfig.economy.boostActive = true;
+          // Extend if already active, else set new
+          const currentExpiry = guildConfig.economy.boostExpiresAt && guildConfig.economy.boostExpiresAt > new Date()
+            ? guildConfig.economy.boostExpiresAt.getTime()
+            : Date.now();
+
+          guildConfig.economy.boostExpiresAt = new Date(currentExpiry + durationMs);
+          await guildConfig.save();
+
+          await interaction.editReply(`🚀 **Boost Attivato!** Durata: ${durationDays} giorni.\nScadenza: <t:${Math.floor(guildConfig.economy.boostExpiresAt.getTime() / 1000)}:R>`);
+        }
+        else if (subAction === 'reset') {
+          guildConfig.serverProfile.lastPostDate = null; // Reset cooldown
+          await guildConfig.save();
+          await interaction.editReply('🔄 **Cooldown Resettato!** Puoi postare una nuova partnership immediatamente.');
+        }
+      }
+      else {
+        await interaction.editReply(`Azione non riconosciuta: ${action}`);
+      }
+    } catch (err) {
+      console.error(err);
+      await interaction.editReply('❌ Errore durante l\'esecuzione dell\'azione.');
+    }
   }
 }
 

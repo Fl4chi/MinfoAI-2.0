@@ -1,4 +1,6 @@
 const chalk = require('chalk');
+const fs = require('fs');
+const path = require('path');
 
 // Error Code Registry - TUTTI GLI ERRORI DEL BOT
 const ERROR_CODES = {
@@ -12,18 +14,22 @@ const ERROR_CODES = {
   COMMAND_EXECUTION_FAILED: { code: 2002, message: 'Command execution failed', severity: 'ERROR' },
   MISSING_PERMISSIONS: { code: 2003, message: 'Missing required permissions', severity: 'WARNING' },
   INVALID_ARGUMENTS: { code: 2004, message: 'Invalid command arguments', severity: 'WARNING' },
+  SETUP_FAILED: { code: 2005, message: 'Setup command failed', severity: 'CRITICAL' },
 
   // Errori di validazione (3000-3999)
   VALIDATION_FAILED: { code: 3001, message: 'Validation failed', severity: 'WARNING' },
   INVALID_GUILD_CONFIG: { code: 3002, message: 'Invalid guild configuration', severity: 'ERROR' },
   MISSING_GUILD_CONFIG: { code: 3003, message: 'Guild not configured', severity: 'WARNING' },
+  PROFILE_INCOMPLETE: { code: 3004, message: 'Server profile incomplete', severity: 'WARNING' },
+  INVALID_INVITE: { code: 3005, message: 'Invalid invite link', severity: 'WARNING' },
 
-  // Errori di partnership (4000-4999)
+  // Errori di partnership & Economy (4000-4999)
   PARTNERSHIP_NOT_FOUND: { code: 4001, message: 'Partnership not found', severity: 'WARNING' },
   PARTNERSHIP_ALREADY_EXISTS: { code: 4002, message: 'Partnership already exists', severity: 'WARNING' },
   PARTNERSHIP_CREATION_FAILED: { code: 4003, message: 'Partnership creation failed', severity: 'ERROR' },
-  PARTNERSHIP_UPDATE_FAILED: { code: 4004, message: 'Partnership update failed', severity: 'ERROR' },
-  PARTNERSHIP_DELETE_FAILED: { code: 4005, message: 'Partnership deletion failed', severity: 'ERROR' },
+  AUTO_PARTNER_ERROR: { code: 4006, message: 'Auto-Partnership cycle failed', severity: 'ERROR' },
+  ECO_ADD_USER_FAIL: { code: 4007, message: 'Failed to add coins to user', severity: 'ERROR' },
+  ECO_SPEND_FAIL: { code: 4008, message: 'Insufficient funds or spend error', severity: 'WARNING' },
 
   // Errori di API (5000-5999)
   API_REQUEST_FAILED: { code: 5001, message: 'API request failed', severity: 'ERROR' },
@@ -42,11 +48,14 @@ class ErrorLogger {
   constructor() {
     this.logs = [];
     this.startTime = new Date();
+    this.docPath = path.join(__dirname, '../../BOT_DOCUMENTATION.md');
   }
 
   // Log con codice errore (con suggerimenti AI)
   async logError(severity, additionalInfo = '', errorCode = 'UNKNOWN_ERROR', error = null) {
     const timestamp = new Date().toLocaleTimeString('it-IT');
+    const errorDef = ERROR_CODES[errorCode] || ERROR_CODES.UNKNOWN_ERROR;
+
     const logEntry = {
       timestamp,
       severity,
@@ -62,11 +71,11 @@ class ErrorLogger {
     const severityColor = this.getSeverityColor(severity);
     const codeStr = chalk.yellow(`[ERR-${errorCode}]`);
     const timeStr = chalk.gray(`[${timestamp}]`);
-    const msg = severityColor(errorData.message);
+    const msg = severityColor(errorDef.message);
     const add = additionalInfo ? chalk.cyan(` - ${additionalInfo}`) : '';
-    const ctx = context ? chalk.gray(` (${context})`) : '';
+    const errDetail = error ? chalk.red(` (${error.message})`) : '';
 
-    console.log(`${timeStr} ${codeStr} ${msg}${add}${ctx}`);
+    console.log(`${timeStr} ${codeStr} ${msg}${add}${errDetail}`);
   }
 
   // Log di info/success
@@ -128,6 +137,38 @@ class ErrorLogger {
   // Ottieni error code list
   getErrorCodes() {
     return ERROR_CODES;
+  }
+
+  /**
+   * AI Error Doctor: Retrieves the solution for a given error code from documentation
+   * @param {string} errorCode 
+   * @returns {string} Solution text
+   */
+  getSolution(errorCode) {
+    try {
+      // Simple lookup for now, could be enhanced to parse MD file dynamically
+      // But since we hardcoded the table in MD, we can also hardcode a fallback map or read the file.
+      // Reading file is better for "AI" feel.
+
+      if (!fs.existsSync(this.docPath)) return "Documentazione non trovata.";
+
+      const content = fs.readFileSync(this.docPath, 'utf8');
+      const lines = content.split('\n');
+
+      for (const line of lines) {
+        if (line.includes(`\`${errorCode}\``)) {
+          // Format: | `CODE` | Error | Solution |
+          const parts = line.split('|');
+          if (parts.length >= 4) {
+            return parts[3].trim();
+          }
+        }
+      }
+
+      return "Soluzione non trovata nella documentazione. Contatta il supporto.";
+    } catch (e) {
+      return "Errore nel recupero della soluzione.";
+    }
   }
 }
 

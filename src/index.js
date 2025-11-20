@@ -7,6 +7,7 @@ const commandHandler = require('./handlers/commandHandler');
 const eventHandler = require('./handlers/eventHandler');
 const AdvancedLogger = require('./utils/advancedLogger');
 const InteractionHandler = require('./handlers/interactionHandler');
+const AutoPartnershipService = require('./services/autoPartnership');
 
 // Gestione errori processo globale
 process.on('unhandledRejection', (reason, promise) => {
@@ -43,10 +44,12 @@ const init = async () => {
     // Inizializza AdvancedLogger e InteractionHandler
     const advancedLogger = new AdvancedLogger(client, process.env.LOG_CHANNEL_ID);
     const interactionHandler = new InteractionHandler(client, advancedLogger);
+    const autoPartnership = new AutoPartnershipService(client);
 
     // Registra gli handlers nel client per accesso globale
     client.advancedLogger = advancedLogger;
     client.interactionHandler = interactionHandler;
+    client.autoPartnership = autoPartnership;
 
     // 3. Caricamento Handlers
     await commandHandler(client);
@@ -54,6 +57,11 @@ const init = async () => {
 
     // 4. Login Discord
     await client.login(process.env.DISCORD_TOKEN);
+
+    // 5. Avvio Servizi Automatici (dopo login)
+    client.once('clientReady', () => {
+      autoPartnership.start();
+    });
 
   } catch (err) {
     console.error(err); // FORCE PRINT ERROR

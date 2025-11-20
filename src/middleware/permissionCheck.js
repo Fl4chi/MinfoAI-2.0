@@ -1,4 +1,4 @@
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const GuildConfig = require('../schemas/guildConfig');
 
 /**
@@ -20,8 +20,8 @@ const permissionCheck = async (interaction) => {
         .setTitle('❌ Errore di Configurazione')
         .setDescription('Il server non è stato configurato ancora. Usa `/setup` per configurarlo.')
         .setTimestamp();
-      
-      await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+
+      await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
       return false;
     }
 
@@ -39,21 +39,21 @@ const permissionCheck = async (interaction) => {
       .setTitle('❌ Permesso Negato')
       .setDescription('Non hai i permessi necessari per eseguire questo comando. Devi essere Administrator o avere il ruolo Staff.')
       .setTimestamp();
-    
-    await interaction.reply({ embeds: [deniedEmbed], ephemeral: true });
+
+    await interaction.reply({ embeds: [deniedEmbed], flags: MessageFlags.Ephemeral });
     return false;
   } catch (error) {
     console.error('Permission check error:', error);
     interaction.client.advancedLogger?.error(`Permission check failed: ${error.message}`, error.stack);
-    
+
     const errorEmbed = new EmbedBuilder()
       .setColor(0xdc2626)
       .setTitle('❌ Errore')
       .setDescription('Si è verificato un errore durante il controllo dei permessi.')
       .setTimestamp();
-    
+
     if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+      await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
     }
     return false;
   }
