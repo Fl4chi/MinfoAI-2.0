@@ -4,7 +4,7 @@
 
 const errorLogger = require('../utils/errorLogger');
 
-// 1000+ ESEMPI DIVERSI - Pool gigante
+// MEGA POOL CON 100+ ESEMPI DIVERSI (espandibile facilmente)
 const EXAMPLES_POOL = [
     "server gaming con 400 persone vorresti collaborare con altri server simili",
     "community di fotografi con 750 membri cerca designer e videomaker",
@@ -35,14 +35,81 @@ const EXAMPLES_POOL = [
     "gruppo writers con 360 scrittori vuole critique partner e beta reader",
     "community yoga con 625 praticanti cerca istruttori certificati",
     "server programming con 1380 developer vuole code review reciproci",
-    "gruppo astronomy con 410 appassionati cerca astrofotografi esperti"
-    // In produzione: continua fino a 1000+
+    "gruppo astronomy con 410 appassionati cerca astrofotografi esperti",
+    "community fashion con 730 fashionisti cerca stylist e influencer",
+    "server minecraft con 2100 builder vuole build collaboration",
+    "gruppo meditation con 380 praticanti cerca guru e teacher",
+    "community pets con 950 owner cerca veterinari e groomer",
+    "server valorant con 1670 player cerca scrim partner competitivi",
+    "gruppo entrepreneurs con 540 founder cerca business mentor",
+    "community fortnite con 2850 gamer vuole custom lobby insieme",
+    "server league con 1920 player cerca team ranked serio",
+    "gruppo baking con 470 pasticceri cerca ricette segrete famiglia",
+    "community science con 620 nerd cerca lab partner esperimenti",
+    "server among us con 1340 crewmate vuole private lobbies",
+    "gruppo investing con 890 trader cerca stock tips real-time",
+    "community running con 710 runner cerca training buddy motivati",
+    "server genshin con 2240 traveler vuole co-op domain farming",
+    "gruppo painting con 390 pittori cerca modelli still life",
+    "community chess24 con 580 GM cerca simultaneous exhibition",
+    "server apex con 1530 legend vuole ranked grind squad",
+    "gruppo skincare con 820 beauty guru cerca product review",
+    "community woodworking con 450 artigiani cerca project ideas",
+    "server warzone con 1780 operator vuole quads ranked push",
+    "gruppo meditation con 320 zen master cerca guided sessions",
+    "community cars con 960 petrolhead cerca meet organizer",
+    "server csgo con 2010 AWPer vuole practice retakes serio",
+    "gruppo vegan con 540 plant-based cerca meal prep ideas",
+    "community cocktails con 410 bartender cerca signature recipe",
+    "server dota con 1450 carry player vuole party ranked mmr",
+    "gruppo hiking con 670 mountaineer cerca trail companions",
+    "community aquarium con 280 fishkeeper cerca breeding tips",
+    "server overwatch con 1320 support main vuole scrim organized",
+    "gruppo keto con 790 low-carb cerca macro calculator help",
+    "community plants con 510 green thumb cerca propagation swap",
+    "server rocket league con 1140 GC vuole 3s tournament team",
+    "gruppo intermittent fasting con 620 faster cerca accountability",
+    "community reptiles con 350 herp cerca breeding project",
+    "server wow con 1890 raider cerca mythic progression guild",
+    "gruppo powerlifting con 480 lifter cerca form check video",
+    "community birds con 290 aviary cerca hand-feeding tips",
+    "server rust con 1560 farmer vuole duo trio server",
+    "gruppo crossfit con 710 athlete cerca WOD partner daily",
+    "community ferrets con 190 owner cerca vet specialist exotic",
+    "server terraria con 920 builder vuole expert playthrough co-op",
+    "gruppo martial arts con 540 sensei cerca sparring partner",
+    "community hamsters con 240 owner cerca cage setup ideas",
+    "server satisfactory con 780 engineer vuole factory tour",
+    "gruppo boxing con 420 boxer cerca training routine share",
+    "community guinea pigs con 310 cavy cerca diet advice",
+    "server factorio con 650 optimizer vuole megabase blueprint",
+    "gruppo calisthenics con 590 athlete cerca park workout",
+    "community rabbits con 270 bunny cerca bonding tips pair",
+    "server rimworld con 510 colonist vuole modded challenge",
+    "gruppo swimming con 380 swimmer cerca technique improvement",
+    "community chinchillas con 150 owner cerca dust bath tips",
+    "server stardew con 1230 farmer vuole multiplayer farm chill",
+    "gruppo cycling con 820 cyclist cerca route recommendations",
+    "community hedgehogs con 180 hoglet cerca quill care advice",
+    "server ark con 1470 survivor vuole tribe PvP competitive",
+    "gruppo triathlon con 310 ironman cerca training plan share",
+    "community sugar gliders con 120 owner cerca diet supplement",
+    "server 7 days con 690 zombie killer vuole horde night",
+    "gruppo tennis con 450 player cerca doubles partner club",
+    "community bearded dragons con 340 reptile cerca UVB setup",
+    "server conan con 530 barbarian vuole clan raiding PvP",
+    "gruppo skateboarding con 370 skater cerca trick tutorial",
+    "community leopard geckos con 210 breeder cerca morph genetics",
+    "server atlas con 410 pirate vuole company alliance naval",
+    "gruppo surfing con 290 surfer cerca break forecast real-time",
+    "community ball pythons con 280 keeper cerca feeding schedule",
+    "server dayz con 1150 survivor vuole squad tactical RP",
+    "gruppo snowboarding con 330 rider cerca mountain recommendations",
+    "community crested geckos con 160 owner cerca bioactive setup"
 ];
 
-// FUNZIONE per pescare esempio RANDOM
 function getRandomExample() {
-    const randomIndex = Math.floor(Math.random() * EXAMPLES_POOL.length);
-    return EXAMPLES_POOL[randomIndex];
+    return EXAMPLES_POOL[Math.floor(Math.random() * EXAMPLES_POOL.length)];
 }
 
 class ConversationalAI {
@@ -51,10 +118,8 @@ class ConversationalAI {
             const category = this.categorizeQuestion(question);
             const response = this.getFallbackResponse(question, context, category);
 
-            // Pass categoria al context per logging
             context.detectedCategory = category;
 
-            // Reminder con Discord subtext
             return response + '\n\n-# 💬 Usa `/ai-help` per continuare a chattare con me!';
         } catch (error) {
             console.error('[conversationalAI] Error:', error.message);
@@ -127,7 +192,7 @@ class ConversationalAI {
 
             examples: `Ti faccio qualche **esempio pratico** 💡\n\n**🎮 Esempio 1:**\nHai server gaming 600 membri\n→ Usi \`/partner-match\`\n→ Trova 3 server simili\n→ Mandi \`/partnership-request\` al primo\n→ Compili bene\n→ Viene approvato **BOOM!** 💥\n→ Organizzi torneo insieme\n→ Entrambi server crescono 📈\n\n**✅ Esempio 2:**\nRicevi richiesta partnership\n→ Usi \`/partnership-view\` per dettagli\n→ Server sembra serio:\n   • 800 membri attivi\n   • Buona descrizione\n   • Trust score 65\n→ Fai \`/partnership-approve\`\n→ Partnership PARTE! 🚀\n\n**❌ Esempio 3:**\nPartnership non funziona (membri inattivi, zero eventi)\n→ Usi \`/partnership-delete\`\n→ Meglio chiudere quelle morte e cercarne nuove\n\n**Hai esempi specifici che ti interessano?** 🤔`,
 
-            ai_tech: `L'**intelligenza artificiale** che uso è stata sviluppata internamente da **Flachi e tutto il suo team** di sviluppo 🧠\n\nSiamo ancora in fase abbastanza iniziale - diciamo **versione nativa** 🌱\nQuindi ci stiamo lavorando costantemente per migliorarla!\n\n**🎯 Obiettivo:**\nRenderla sempre più utile per:\n• Gestire partnership\n• Aiutarti con consigli specifici server\n\n**✅ Ora funziona bene per:**\n• Rispondere domande\n• Dare suggerimenti\n• Spiegare comandi\n\nSe noti che a volte risposte potrebbero essere migliorate:\n→ È normale! Lavoro in continua evoluzione 🔄\n\n> Flachi e team aggior nano regolarmente il sistema 💪`,
+            ai_tech: `L'**intelligenza artificiale** che uso è stata sviluppata internamente da **Flachi e tutto il suo team** di sviluppo 🧠\n\nSiamo ancora in fase abbastanza iniziale - diciamo **versione nativa** 🌱\nQuindi ci stiamo lavorando costantemente per migliorarla!\n\n**🎯 Obiettivo:**\nRenderla sempre più utile per:\n• Gestire partnership\n• Aiutarti con consigli specifici server\n\n**✅ Ora funziona bene per:**\n• Rispondere domande\n• Dare suggerimenti\n• Spiegare comandi\n\nSe noti che a volte risposte potrebbero essere migliorate:\n→ È normale! Lavoro in continua evoluzione 🔄\n\n> Flachi e team aggiornano regolarmente il sistema 💪`,
 
             general: `**Ciao!** Sono qui per aiutarti con partnership e crescita server 🚀\n\n**Puoi chiedermi tipo:**\n• _"Come faccio a creare partnership?"_\n• _"Perché mia richiesta è stata rifiutata?"_\n• _"Come trovo server compatibili?"_\n• _"Cosa significa trust score?"_\n• Qualsiasi altra cosa ti venga in mente!\n\n**💡 Pro tip:**\nPiù sei **specifico** nella domanda = più posso darti risposta utile\n\nQuindi invece di domande generiche:\n→ Chiedi pure cose **precise** sulla tua situazione!\n\n**Cosa ti serve sapere?** 🤔`
         };
