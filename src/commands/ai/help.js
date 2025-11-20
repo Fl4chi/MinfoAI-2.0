@@ -47,8 +47,11 @@ module.exports = {
             // Chiedi all'AI
             const aiResponse = await conversationalAI.askQuestion(question, context);
 
-            // Risposta semplice e pulita (NO EMBED)
-            await interaction.editReply(aiResponse);
+            // Risposta semplice e pulita (NO EMBED, EPHEMERAL)
+            await interaction.editReply({
+                content: aiResponse,
+                flags: 64 // MessageFlags.Ephemeral
+            });
 
         } catch (error) {
             errorLogger.logError('ERROR', 'Errore comando ai-help', 'AI_HELP_ERROR', error);
