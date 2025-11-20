@@ -79,33 +79,38 @@ class ConversationalAI {
     categorizeQuestion(question) {
         const q = question.toLowerCase();
 
-        if (q.includes('minfoai') || q.includes('cosa fa') || q.includes('cosa puo') || q.includes('che bot')) return 'bot_info';
+        // Saluti e Intro
+        if (q.match(/\b(ciao|salve|buongiorno|buonasera|ehi|hello|hi|start|inizio)\b/)) return 'bot_info';
+        if (q.includes('minfoai') || q.includes('chi sei') || q.includes('cosa fai') || q.includes('presentati')) return 'bot_info';
 
-        if ((q.includes('che') || q.includes('quale')) && q.includes('partnership') && (q.includes('fare') || q.includes('puo') || q.includes('gestire'))) {
-            return 'bot_partnership_features';
-        }
+        // Partnership Features
+        if ((q.includes('che') || q.includes('quale')) && q.includes('partnership') && (q.includes('fare') || q.includes('puo') || q.includes('gestire'))) return 'bot_partnership_features';
         if (q.includes('funzionalita') && q.includes('partnership')) return 'bot_partnership_features';
 
+        // Approval/Rejection
         if (q.includes('approv') || q.includes('accetta') || q.includes('requisiti')) return 'partnership_approval';
-        if (q.includes('rifiut') || q.includes('reject')) return 'partnership_reject';
+        if (q.includes('rifiut') || q.includes('reject') || q.includes('negata')) return 'partnership_reject';
 
-        if (q.includes('creare partnership') || q.includes('fare partnership')) return 'create_partnership';
-        if (q.includes('veder') && q.includes('partnership')) return 'view_partnerships';
+        // Actions
+        if (q.includes('creare') || q.includes('richiedere') || q.includes('nuova partnership')) return 'create_partnership';
+        if (q.includes('vedere') || q.includes('lista') || q.includes('elenco')) return 'view_partnerships';
+        if (q.includes('trovare') || q.includes('cercare') || q.includes('match')) return 'find_partners';
 
-        if (q.includes('comando') || q.includes('come uso') || q.includes('come si usa')) return 'commands';
-        if (q.includes('/setup') || q.includes('configurare') || q.includes('configurazione')) return 'setup_help';
+        // Help & Config
+        if (q.includes('comando') || q.includes('comandi') || q.includes('lista comandi')) return 'commands';
+        if (q.includes('setup') || q.includes('configur') || q.includes('install')) return 'setup_help';
+        if (q.includes('errore') || q.includes('bug') || q.includes('non funziona')) return 'troubleshooting';
 
-        if (q.includes('tier') || q.includes('livello') || q.includes('bronze') || q.includes('silver') || q.includes('gold') || q.includes('platinum')) return 'tier_system';
-        if (q.includes('trust') || q.includes('score') || q.includes('punteggio') || q.includes('reputazione')) return 'trust_score';
+        // Systems
+        if (q.includes('tier') || q.includes('livello') || q.includes('rank') || q.includes('bronze')) return 'tier_system';
+        if (q.includes('trust') || q.includes('score') || q.includes('punteggio') || q.includes('affidabil')) return 'trust_score';
 
-        if (q.includes('crescere') || q.includes('migliorare') || q.includes('aumentare membri') || q.includes('far crescere')) return 'server_improvement';
-        if (q.includes('trovare') && (q.includes('partner') || q.includes('server'))) return 'find_partners';
+        // Advice
+        if (q.includes('crescere') || q.includes('migliorare') || q.includes('consigli') || q.includes('aumentare')) return 'server_improvement';
+        if (q.includes('esempio')) return 'examples';
 
-        if (q.includes('errore') || q.includes('problema') || q.includes('non funziona') || q.includes('bug')) return 'troubleshooting';
-        if (q.includes('esempio') || q.includes('per esempio')) return 'examples';
-
-        if ((q.includes('che') || q.includes('quale')) && (q.includes('ai') || q.includes('intelligenza'))) return 'ai_tech';
-        if (q.includes('ollama') || q.includes('llama') || q.includes('tecnologia')) return 'ai_tech';
+        // Tech/Meta
+        if (q.includes('ai') || q.includes('intelligenza') || q.includes('bot') || q.includes('tecnologia') || q.includes('svilupp')) return 'ai_tech';
 
         return 'general';
     }
@@ -116,17 +121,15 @@ class ConversationalAI {
         // bot_info multilingua
         if (category === 'bot_info') {
             const multilingualBotInfo = {
-                it: `**Ciao!** Sono qui per aiutarti a gestire le **partnership** del tuo server Discord.\n\nPensa a me come quel amico esperto che ti da una mano quando devi trovare collaborazioni serie e far crescere la community.\n\n**Ti faccio un esempio pratico:**\nMettiamo che hai un ${getRandomExample()}. Io ti aiuto a trovare quelli giusti, valutare se sono affidabili, e tenere tutto organizzato.\n\nNon dovrai più perdere tempo con richieste spam o partnership che non portano a nulla.\n\n**Sistema di classificazione:**\n\`Bronze\` → \`Silver\` → \`Gold\` → \`Platinum\`\n\nCosì puoi dare priorità alle collaborazioni più importanti. Tengo traccia di tutto, hai sempre sott'occhio come stanno andando le cose.\n\n→ Per iniziare usa \`/setup\` (sono letteralmente due minuti)`,
+                it: `**Ciao!** 👋 Sono MinfoAI, il tuo assistente personale per le partnership.\n\nIl mio lavoro è semplice: ti aiuto a far crescere il tuo server trovando le collaborazioni giuste, senza farti perdere tempo con spam o server inattivi.\n\n**Cosa posso fare per te:**\n• **Trovare Partner:** Analizzo il tuo server e ti suggerisco community compatibili (es. se hai un server gaming, ti trovo altri server gaming seri).\n• **Gestire Richieste:** Automatizzo tutto il processo di richiesta e approvazione.\n• **Valutare Affidabilità:** Uso un sistema di Trust Score per dirti se un partner è affidabile.\n\n**Esempio al volo:**\nImmagina di avere un ${getRandomExample()}. Io ti trovo subito altri server simili con cui fare eventi o scambi, così crescete insieme.\n\nSe vuoi iniziare subito a configurare il sistema, scrivi \`/setup\`!`,
 
-                en: `**Hello!** I'm here to help you manage **partnerships** for your Discord server.\n\nThink of me as that expert friend who helps you find serious collaborations and grow your community.\n\n**Practical example:**\nLet's say you have a ${getRandomExample()}. I help you find the right ones, evaluate reliability, and keep everything organized.\n\nNo more wasting time with spam requests or partnerships that lead nowhere.\n\n**Classification system:**\n\`Bronze\` → \`Silver\` → \`Gold\` → \`Platinum\`\n\nSo you can prioritize the most important collaborations. I keep track of everything.\n\n→ To start use \`/setup\` (literally two minutes)`,
+                en: `**Hello!** 👋 I'm MinfoAI, your personal partnership assistant.\n\nMy job is simple: I help you grow your server by finding the right collaborations, without wasting time on spam or inactive servers.\n\n**What I can do for you:**\n• **Find Partners:** I analyze your server and suggest compatible communities.\n• **Manage Requests:** I automate the entire request and approval process.\n• **Evaluate Reliability:** I use a Trust Score system to tell you if a partner is reliable.\n\n**Quick example:**\nImagine you have a ${getRandomExample()}. I immediately find you other similar servers to do events or exchanges with, so you grow together.\n\nTo start configuring the system right away, type \`/setup\`!`,
 
-                es: `**¡Hola!** Est
+                es: `**¡Hola!** 👋 Soy MinfoAI, tu asistente personal de asociaciones.\n\nMi trabajo es simple: te ayudo a hacer crecer tu servidor encontrando las colaboraciones adecuadas.\n\n**Lo que puedo hacer:**\n• **Encontrar Socios:** Analizo tu servidor y sugiero comunidades compatibles.\n• **Gestionar Solicitudes:** Automatizo todo el proceso.\n• **Evaluar Confiabilidad:** Uso un Trust Score para decirte si un socio es confiable.\n\n**Ejemplo rápido:**\nImagina que tienes un ${getRandomExample()}. Te encuentro otros servidores similares para crecer juntos.\n\n¡Para empezar escribe \`/setup\`!`,
 
-oy aquí para ayudarte a gestionar **asociaciones** para tu servidor Discord.\n\nPiensa en mí como ese amigo experto que te ayuda a encontrar colaboraciones serias y hacer crecer tu comunidad.\n\n**Ejemplo práctico:**\nDigamos que tienes un ${getRandomExample()}. Te ayudo a encontrar los correctos, evaluar confiabilidad y mantener todo organizado.\n\nNo más perder tiempo con solicitudes spam.\n\n**Sistema de clasificación:**\n\`Bronze\` → \`Silver\` → \`Gold\` → \`Platinum\`\n\nAsí puedes priorizar las colaboraciones importantes. Hago seguimiento de todo.\n\n→ Para empezar usa \`/setup\` (literalmente dos minutos)`,
+                fr: `**Bonjour!** 👋 Je suis MinfoAI, votre assistant personnel de partenariats.\n\nMon travail est simple : je vous aide à développer votre serveur en trouvant les bonnes collaborations.\n\n**Ce que je peux faire:**\n• **Trouver des Partenaires:** J'analyse votre serveur et suggère des communautés compatibles.\n• **Gérer les Demandes:** J'automatise tout le processus.\n• **Évaluer la Fiabilité:** J'utilise un Trust Score pour la fiabilité.\n\n**Exemple rapide:**\nImaginez que vous avez un ${getRandomExample()}. Je vous trouve d'autres serveurs similaires pour grandir ensemble.\n\nPour commencer tapez \`/setup\`!`,
 
-                fr: `**Bonjour!** Je suis là pour vous aider à gérer les **partenariats** de votre serveur Discord.\n\nPensez à moi comme cet ami expert qui vous aide à trouver des collaborations sérieuses.\n\n**Exemple pratique:**\nDisons que vous avez un ${getRandomExample()}. Je vous aide à trouver les bons, évaluer la fiabilité et tout garder organisé.\n\nPlus de temps perdu avec spam.\n\n**Système:**\n\`Bronze\` → \`Silver\` → \`Gold\` → \`Platinum\`\n\nPour commencer: \`/setup\``,
-
-                de: `**Hallo!** Ich helfe dir, **Partnerschaften** für deinen Discord-Server zu verwalten.\n\nDenk an mich als Experten-Freund für ernsthafte Kooperationen.\n\n**Beispiel:**\nDu hast einen ${getRandomExample()}. Ich helfe dir, die richtigen zu finden.\n\nKeine Zeitverschwendung.\n\n**System:**\n\`Bronze\` → \`Silver\` → \`Gold\` → \`Platinum\`\n\nStarten: \`/setup\``
+                de: `**Hallo!** 👋 Ich bin MinfoAI, dein persönlicher Partnerschafts-Assistent.\n\nMein Job ist einfach: Ich helfe dir, deinen Server durch die richtigen Kooperationen wachsen zu lassen.\n\n**Was ich tun kann:**\n• **Partner finden:** Ich analysiere deinen Server und schlage kompatible Communities vor.\n• **Anfragen verwalten:** Ich automatisiere den gesamten Prozess.\n• **Zuverlässigkeit bewerten:** Ich nutze einen Trust Score.\n\n**Schnelles Beispiel:**\nStell dir vor, du hast einen ${getRandomExample()}. Ich finde ähnliche Server für dich.\n\nZum Starten tippe \`/setup\`!`
             };
 
             return multilingualBotInfo[lang] || multilingualBotInfo.it;
@@ -134,35 +137,35 @@ oy aquí para ayudarte a gestionar **asociaciones** para tu servidor Discord.\n\
 
         // Resto risposte (solo italiano)
         const responses = {
-            bot_partnership_features: `Perfetto! Ti spiego esattamente **che tipo di partnership** gestisco.\n\n**Creazione Partnership**\nTu mandi richiesta con \`/partnership-request\`, io processo e sottopongo allo staff.\n\n**Matchmaking Automatico**\nCon \`/partner-match\` analizzo il tuo server (membri, tematica, lingua) e trovo compatibili.\n\n**Gestione Tier**\n\`Bronze\` \`Silver\` \`Gold\` \`Platinum\` - ogni tier ha vantaggi diversi.\n\n**Trust Score System**\nTraccia affidabilità (parti da 50/100).\n\n**Monitoraggio**\n\`/partnership-list\` e \`/partnership-stats\`\n\nCiclo: creazione → matchmaking → approvazione → classificazione → monitoraggio`,
+            bot_partnership_features: `Ti spiego come gestisco le partnership in modo professionale.\n\nNon sono un semplice bot che posta messaggi. Io **gestisco l'intero ciclo di vita** di una collaborazione:\n\n1. **Analisi:** Quando arriva una richiesta, controllo se il server rispetta i requisiti (membri, attività, qualità).\n2. **Matchmaking:** Se cerchi partner, uso il comando \`/partner-match\` per trovarti server simili al tuo (per lingua, tema e dimensione).\n3. **Classificazione:** Assegno un Tier (Bronze, Silver, Gold, Platinum) in base alla qualità della partnership.\n4. **Monitoraggio:** Tengo d'occhio se la partnership viene mantenuta o se il link scade.\n\nÈ come avere un Partnership Manager umano, ma attivo 24/7.`,
 
-            partnership_approval: `Per richiesta **accettata:**\n\n**Requisiti:**\n• Minimo **500 persone** attive\n• Community vera\n\n**Presentazione:**\n❌ "bel server"\n✅ "Server gaming IT, tornei weekend, 800 attivi"\n\n**Altri:**\n• Link funzionante\n• Trust score 40+\n\nUsa \`/partnership-request\``,
+            partnership_approval: `Per far approvare una partnership, cerchiamo **qualità** più che quantità.\n\nEcco cosa guardiamo di solito:\n• **Attività Reale:** 500 membri veri che chattano valgono più di 5000 bot offline.\n• **Presentazione:** La descrizione deve far venire voglia di entrare. Evita "entrate pls", scrivi "Siamo una community di X che fa Y ogni settimana".\n• **Affidabilità:** Il server deve avere un Trust Score decente (sopra i 40 punti).\n\nSe la tua richiesta rispetta questi standard, usa \`/partnership-request\` e vedrai che sarà accettata velocemente!`,
 
-            partnership_reject: `Rifiuto = motivo specifico sistemabile.\n\n**Problemi comuni:**\n• Membri insufficienti\n• Descrizione generica\n• Link morto\n• Score basso\n\nPuoi riprovare dopo fix. Non è NO permanente.\n\nErrore? \`/partnership-report\``,
+            partnership_reject: `Se una richiesta viene rifiutata, non prenderla sul personale! Serve a mantenere alta la qualità per tutti.\n\nDi solito i motivi sono:\n1. **Descrizione troppo breve:** Non si capisce cosa fa il server.\n2. **Link scaduto:** L'invito non funziona più.\n3. **Community inattiva:** Se l'ultimo messaggio in chat risale a un mese fa, è difficile collaborare.\n\nIl bello è che puoi sistemare queste cose e riprovare. Migliora la descrizione, riattiva la chat e manda una nuova richiesta!`,
 
-            create_partnership: `Semplice!\n\n1. \`/partnership-request\`\n2. Compila bene\n\n**Consiglio:** descrizione dettagliata su server, attività, community.\n\nStaff valuta → se ok = approvata`,
+            create_partnership: `Ottimo, vuoi espandere il network! Creare una richiesta è super intuitivo.\n\nUsa il comando \`/partnership-request\`. Ti chiederò:\n• Il nome del tuo server\n• Quanti membri hai\n• Una bella descrizione (qui giocatela bene!)\n• Il link di invito\n\nUna volta inviata, il mio sistema la processa e la notifica allo staff dell'altro server. Se accettano, la partnership è attiva!\n\n**Consiglio:** Sii onesto sui numeri. Le partnership migliori nascono dalla trasparenza.`,
 
-            view_partnerships: `\`/partnership-list\` - tutte\n\`/partnership-view [ID]\` - dettagli\n\`/partnership-stats\` - numeri`,
+            view_partnerships: `Per tenere tutto sotto controllo hai diversi strumenti:\n\n• \`/partnership-list\`: Ti mostra l'elenco completo di chi collabora con te.\n• \`/partnership-view [ID]\`: Ti da la scheda tecnica dettagliata di una singola partnership.\n• \`/partnership-stats\`: Ti da i numeri globali (quante partnership hai, di che livello sono, ecc).\n\nÈ tutto a portata di mano, niente più fogli Excel disordinati!`,
 
-            commands: `**Comandi:**\n\`/setup\` - configura\n\`/partnership-request\` - richiedi\n\`/partnership-list\` - vedi attive\n\`/partner-match\` - trova\n\`/partnership-approve\` - approva (staff)\n\`/partnership-reject\` - rifiuta (staff)\n\`/partner-tier\` - cambia livello (staff)`,
+            commands: `Ecco gli strumenti principali che hai a disposizione:\n\n🔧 **Gestione:**\n• \`/setup\`: Configura il bot (fallo subito se non l'hai fatto!)\n• \`/partnership-request\`: Invia una proposta\n\n📊 **Controllo:**\n• \`/partnership-list\`: Vedi i tuoi partner\n• \`/partnership-stats\`: Analisi dati\n\n🤝 **Staff:**\n• \`/partnership-approve\` / \`/partnership-reject\`: Gestisci le richieste in arrivo\n• \`/partner-match\`: Trova nuovi amici\n\nSe hai dubbi su uno specifico, chiedimi pure "come funziona il comando X"!`,
 
-            setup_help: `\`/setup\` - iniziale.\n\n3 cose:\n1. Canale Partnership\n2. Ruolo Staff\n3. Canale Log\n\n2 minuti. Puoi rifare per riconfigurare.\n\n**Permessi:** Administrator o gestire canali + messaggi`,
+            setup_help: `Il \`/setup\` è il primo passo fondamentale. Ci metti letteralmente un minuto.\n\nQuando lo lanci, ti chiederò solo di scegliere:\n1. **Canale Partnership:** Dove vuoi che pubblichi le partnership accettate.\n2. **Ruolo Staff:** Chi può accettare/rifiutare le richieste.\n3. **Canale Log:** Dove scrivo cosa succede (richieste, errori, avvisi).\n\nFatto questo, sono operativo al 100%. Se sbagli qualcosa, rilancia il comando e sovrascrivi tutto. Facile!`,
 
-            tier_system: `Tier = punti fedeltà.\n\n🥉 Bronze - base\n🥈 Silver - +10% XP\n🥇 Gold - +25% XP\n💎 Platinum - +50% XP\n\nGestisci: \`/partner-tier\``,
+            tier_system: `Il sistema a Tier serve a premiare i partner migliori. Non tutte le collaborazioni sono uguali!\n\n🥉 **Bronze:** Partnership base.\n🥈 **Silver:** Partner affidabili (+10% visibilità).\n🥇 **Gold:** Partner storici o molto attivi (+25% visibilità).\n💎 **Platinum:** L'élite. I migliori server con cui collabori (+50% visibilità).\n\nLo staff può promuovere i server con \`/partner-tier\`. È un ottimo modo per incentivare gli altri a impegnarsi di più!`,
 
-            trust_score: `Trust = reputazione.\n\n${context.trustScore ? `Tuo: \`${context.trustScore}/100\`` : 'Parti: \`50/100\`'}\n\n• Partnership ok → +10\n• Problemi → -10/-20\n\n**70+** = premium\n**<40** = controllo\n**40** = soglia minima`,
+            trust_score: `Il **Trust Score** è la reputazione del tuo server. Parte da **50/100**.\n\n• **Come sale:** Ogni partnership conclusa con successo, ogni mese di attività senza problemi.\n• **Come scende:** Se spammi, se il link scade e non lo aggiorni, se ricevi segnalazioni.\n\nSopra i **70 punti** sei considerato un partner Premium. Sotto i **40**, potresti avere difficoltà a trovare nuove collaborazioni. Tienilo alto!`,
 
-            server_improvement: `Crescita = strategia.\n\n300 → 1000?\n\n❌ NO: spam\n✅ SI: 3-4 server simili\n\nOrganizza: contest, eventi.\n\n\`/partner-match\` per trovare.\n\n10 fatte bene > 100 random`,
+            server_improvement: `Vuoi crescere? La regola d'oro è: **Contenuto > Spam**.\n\nInvece di mandare inviti a caso, cerca 3-4 server simili al tuo (usa \`/partner-match\` per questo!) e proponi un evento insieme. \n\n**Esempio:** Se hai un server di arte, trova un server di musica e fate un contest "Disegna la copertina dell'album".\n\nQuesto porta utenti attivi e interessati, non numeri vuoti. Io sono qui proprio per aiutarti a trovare quei 3-4 server giusti.`,
 
-            find_partners: `**#1:** \`/partner-match\` - auto\n**#2:** \`/partnership-list\` - attive\n**#3:** Partecipa community, contatta\n\n200 attivi > 2000 morti`,
+            find_partners: `Per trovare nuovi partner hai tre strade:\n\n1. **La via Smart:** Usa \`/partner-match\`. Analizzo il tuo server e ti dico "Ehi, questo server è simile al tuo, dovreste collaborare!".\n2. **La via Manuale:** Usa \`/partnership-list\` per vedere chi è già partner e magari rafforzare il legame.\n3. **La via Social:** Entra nelle community che ti suggerisco e presentati.\n\nRicorda: meglio 1 partner attivo che 10 morti. Punta sulla qualità.`,
 
-            troubleshooting: `Problema?\n\n1. \`/setup\` - verifica\n2. Permessi bot\n3. Canale log\n\nAncora? \`/partnership-report\` + spiega`,
+            troubleshooting: `Se qualcosa non va, non preoccuparti. Di solito è una sciocchezza.\n\n1. **Controlla il Setup:** Lancia \`/setup\` e verifica che i canali siano giusti.\n2. **Permessi:** Controlla che io abbia il permesso di scrivere in quei canali e di gestire i ruoli.\n3. **Log:** Guarda il canale che hai impostato per i log, spesso scrivo lì qual è il problema.\n\nSe proprio non ne vieni a capo, usa \`/partnership-report\` e descrivi il problema, così il mio sviluppatore può controllare!`,
 
-            examples: `**#1:**\n600 membri → match → richiesta → approvato → torneo → crescita\n\n**#2:**\nRichiesta → view → serio → approve → parte\n\n**#3:**\nNon va → delete → cerca nuove`,
+            examples: `Ti faccio qualche esempio concreto di come posso esserti utile:\n\n**Scenario A: Vuoi crescere**\nHai un server di 600 membri. Usi \`/partner-match\`, trovo un altro server di 550 membri simile. Fate una partnership, organizzate un torneo insieme, e entrambi guadagnate 50 membri attivi.\n\n**Scenario B: Troppe richieste**\nTi arrivano 10 richieste al giorno. Invece di impazzire, io le filtro. Quelle con link scaduti o pochi membri le blocco o le segnalo, tu vedi solo quelle valide su \`/partnership-request\`.\n\nÈ come avere il pilota automatico!`,
 
-            ai_tech: `AI by **Flachi e team**.\n\nFase iniziale, miglioramenti continui.\n\n**Obiettivo:** partnership e consigli.\n\nRisposte migliorabili = normale evoluzione`,
+            ai_tech: `La mia intelligenza è sviluppata internamente dal team di **Flachi**. \n\nNon uso sistemi esterni standard, sono un modello progettato specificamente per capire le dinamiche dei server Discord e delle community.\n\nIl mio obiettivo non è solo "rispondere", ma capire cosa serve al tuo server per crescere. Sono in continuo aggiornamento, quindi divento più intelligente ogni giorno!`,
 
-            general: `Ciao! Aiuto partnership e crescita.\n\nChiedi:\n• "Come creo?"\n• "Perché rifiutata?"\n• "Come trovo?"\n\n**Tip:** specifico = utile`
+            general: `Ciao! Sembra che tu voglia sapere qualcosa sulle partnership o su come migliorare il server, ma non ho capito esattamente cosa.\n\nSono qui apposta! Puoi chiedermi cose come:\n• "Come faccio a trovare nuovi partner?"\n• "Spiegami come funziona il Trust Score"\n• "Perché la mia richiesta è stata rifiutata?"\n\n**Facciamo così:**\nImmagina che io sia un consulente esperto seduto qui con te. Qual è il problema principale del tuo server oggi? Scrivimelo e vediamo di risolverlo insieme!`
         };
 
         return responses[category] || responses.general;
