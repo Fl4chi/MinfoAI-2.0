@@ -3,96 +3,107 @@ const axios = require('axios');
 class ConversationalAI {
     async askQuestion(question, context = {}) {
         try {
-            console.log(`\n[AI] Domanda: "${question.substring(0, 80)}..."`);
+            console.log(`\n[AI] Domanda: "${question.substring(0, 80)}"`);
 
             // Prova Ollama
             try {
+                console.log(`[AI] Tentativo Ollama...`);
                 const response = await this.askOllama(question);
-                if (response) {
-                    console.log(`[AI] Risposta OK (${response.length} chars)`);
+                console.log(`[AI] Ollama response:`, response ? `"${response.substring(0, 100)}..."` : 'NULL');
+
+                if (response && response.length > 10) {
+                    console.log(`[AI] ✅ Risposta Ollama OK (${response.length} chars)`);
                     return response + '\n\n-# 💬 Usa `/ai-help` per altre domande!';
+                } else {
+                    console.log(`[AI] ⚠️ Risposta Ollama troppo corta o null`);
                 }
             } catch (err) {
-                console.log(`[AI] Ollama non disponibile, uso fallback`);
+                console.error(`[AI] ❌ Ollama fallito:`, err.message);
             }
 
             // Fallback semplice
+            console.log(`[AI] 🔄 Uso fallback`);
             return this.getSimpleFallback(question);
 
         } catch (error) {
-            console.error(`[AI] Errore:`, error.message);
+            console.error(`[AI] Errore generale:`, error.message);
             return 'Scusa, ho avuto un problema tecnico. Riprova!';
         }
     }
 
     async askOllama(question) {
-        const botKnowledge = `Sei MinfoAI, assistente per partnership Discord.
+        // Prova prima /api/generate (vecchio), poi /api/chat (nuovo)
+        try {
+            const response = await axios.post('http://localhost:11434/api/generate', {
+                model: 'llama3.2:1b',
+                prompt: `Sei MinfoAI, assistente Discord per partnership. Comandi: /partner, /shop, /wallet, /stats. Rispondi in italiano, max 3 righe, tono amichevole.\n\nDomanda: ${question}\nRisposta:`,
+                stream: false,
+                options: {
+                    temperature: 0.7,
+                    num_predict: 150
+                }
+            }, { timeout: 12000 });
 
-COMANDI DISPONIBILI:
-- /partner request: Richiedi partnership
-- /partner list: Vedi partnership attive
-- /partner view: Dettagli partnership
-- /manager approve/reject/delete: Gestione staff
-- /shop: Compra boost (1gg=200 coins, 3gg=500 coins) o reset cooldown (500 coins)
-- /wallet: Vedi saldo coins
-- /stats: Statistiche utente complete
-- /setup: Configura bot (canali, ruoli)
-
-FUNZIONALITÀ:
-- Trust Score: Reputazione server (50-100, più alto = più affidabile)
-- Boost: Riduce cooldown partnership a 24h
-- Economy: Guadagni coins con attività, spendi nello shop
-
-RISPONDI:
-- Max 2-3 righe
-- Tono amichevole come un amico
-- NO elenchi puntati
-- NO formattazione complessa
-- Scrivi in italiano naturale`;
-
-        const prompt = `${botKnowledge}
-
-Domanda utente: ${question}
-
-Risposta breve e naturale:`;
-
-        const response = await axios.post('http://localhost:11434/api/generate', {
-            model: 'llama3.2:1b',
-            prompt: prompt,
-            stream: false,
-            options: {
-                temperature: 0.8,
-                num_predict: 120,
-                top_p: 0.9
+            if (response.data && response.data.response) {
+                return response.data.response.trim();
             }
-        }, { timeout: 10000 });
+        } catch (err) {
+            // Se /api/generate fallisce, prova /api/chat
+            if (err.response && err.response.status === 404) {
+                console.log(`[AI] /api/generate non disponibile, provo /api/chat...`);
 
-        if (response.data && response.data.response) {
-            return response.data.response.trim();
+                const response = await axios.post('http://localhost:11434/api/chat', {
+                    model: 'llama3.2:1b',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Sei MinfoAI, assistente Discord per partnership. Comandi: /partner, /shop, /wallet, /stats. Rispondi in italiano, max 3 righe, tono amichevole.'
+                        },
+                        {
+                            role: 'user',
+                            content: question
+                        }
+                    ],
+                    stream: false
+                }, { timeout: 12000 });
+
+                if (response.data && response.data.message && response.data.message.content) {
+                    return response.data.message.content.trim();
+                }
+            } else {
+                throw err;
+            }
         }
+
         return null;
     }
 
     getSimpleFallback(question) {
         const q = question.toLowerCase();
 
-        if (q.includes('ciao') || q.includes('chi sei')) {
-            return 'Ciao! Sono MinfoAI, ti aiuto con le partnership del server. Usa `/setup` per iniziare o `/partner request` per richiedere una collaborazione!';
+        if (q.includes('ciao') || q.includes('chi sei') || q.includes('come stai')) {
+            return 'Ciao! Sono MinfoAI, ti aiuto con le partnership del server. Usa `/partner request` per iniziare o chiedi pure!';
         }
-        if (q.includes('comando') || q.includes('comandi')) {
-            return 'Comandi principali: `/partner` (partnership), `/shop` (boost e reset), `/wallet` (coins), `/stats` (statistiche). Cosa ti serve?';
+        if (q.includes('comando') || q.includes('comandi') || q.includes('help')) {
+            return 'Comandi: `/partner` (partnership), `/shop` (boost e tier), `/wallet` (coins), `/stats` (statistiche). Cosa ti serve?';
         }
-        if (q.includes('shop') || q.includes('boost')) {
-            return 'Nello `/shop` trovi: Boost 1 giorno (200 coins), Boost 3 giorni (500 coins), Reset cooldown (500 coins). Compra con i tuoi coins!';
+        if (q.includes('shop') || q.includes('boost') || q.includes('tier')) {
+            return 'Nello `/shop` trovi boost (200-500 coins) e tier upgrade (Silver 1000, Gold 2500, Platinum 5000). I tier danno vantaggi permanenti!';
         }
-        if (q.includes('coin') || q.includes('wallet')) {
-            return 'Usa `/wallet` per vedere i tuoi coins. Li guadagni con attività e partnership, li spendi nello `/shop`!';
+        if (q.includes('coin') || q.includes('wallet') || q.includes('soldi')) {
+            return 'Usa `/wallet` per vedere i tuoi coins. Li guadagni con partnership approvate e li spendi nello `/shop`!';
         }
         if (q.includes('setup') || q.includes('configur')) {
-            return 'Lancia `/setup` e scegli: canale partnership, ruolo staff, canale log. Fatto! Ci metti 1 minuto.';
+            return 'Usa `/setup` per configurare: canale partnership, ruolo staff, canale log. Fatto in 1 minuto!';
+        }
+        if (q.includes('partnership') || q.includes('partner')) {
+            return 'Usa `/partner request` per richiedere una partnership. Gli admin la approveranno e guadagnerai coins!';
+        }
+        if (q.includes('trust') || q.includes('score')) {
+            return 'Il Trust Score misura l\'affidabilità del server (0-100). Più partnership attive hai, più alto è. Vedi il tuo con `/stats`!';
         }
 
-        return 'Non ho capito bene. Prova a riformulare o chiedi tipo "come funziona lo shop" o "cosa sono i comandi"!';
+        return 'Non ho capito bene. Prova a chiedere "come funziona lo shop" o "cosa sono i comandi"!';
     }
 }
 

@@ -145,9 +145,10 @@ class ButtonHandler {
         await interaction.editReply('🗑️ Partnership eliminata dal database.');
       }
       else if (action === 'shop') {
-        // Format: shop_buy_boost_3d
-        const subAction = id.split('_')[1]; // boost, reset
-        const variant = id.split('_')[2]; // 3d, 1d, etc.
+        // Format: shop_buy_boost_3d or shop_buy_reset_cooldown or shop_buy_tier_silver
+        const parts = id.split('_');
+        const subAction = parts[1]; // boost, reset, tier
+        const variant = parts[2]; // 3d, 1d, cooldown, silver, gold, platinum
 
         const guildConfig = await GuildConfig.findOne({ guildId: interaction.guildId });
         if (!guildConfig) return interaction.editReply('❌ Configurazione server non trovata.');
@@ -156,13 +157,13 @@ class ButtonHandler {
         const costs = {
           'boost_3d': 500,
           'boost_1d': 200,
-          'reset': 500
+          'reset_cooldown': 500
         };
 
         const itemKey = variant ? `${subAction}_${variant}` : subAction;
         const cost = costs[itemKey];
 
-        if (!cost) return interaction.editReply('❌ Oggetto non riconosciuto.');
+        if (!cost && subAction !== 'tier') return interaction.editReply('❌ Oggetto non riconosciuto.');
 
         // Check Balance
         let userEco = await UserEconomy.findOne({ userId: interaction.user.id });
@@ -196,9 +197,89 @@ class ButtonHandler {
           await interaction.editReply(`🚀 **Boost Attivato!** Durata: ${durationDays} giorni.\nScadenza: <t:${Math.floor(guildConfig.economy.boostExpiresAt.getTime() / 1000)}:R>`);
         }
         else if (subAction === 'reset') {
-          guildConfig.serverProfile.lastPostDate = null; // Reset cooldown
+          guildConfig.serverProfile.lastPostDate = null;
           await guildConfig.save();
           await interaction.editReply('🔄 **Cooldown Resettato!** Puoi postare una nuova partnership immediatamente.');
+        }
+        else if (subAction === 'tier') {
+          // Format: shop_buy_tier_silver/gold/platinum
+          const targetTier = variant; // silver, gold, platinum
+          const currentTier = guildConfig.economy.tier || 'bronze';
+
+          // Tier costs
+          const tierCosts = { silver: 1000, gold: 2500, platinum: 5000 };
+          const cost = tierCosts[targetTier];
+
+          if (!cost) return interaction.editReply('❌ Tier non valido.');
+
+          // Check balance
+          let userEco = await UserEconomy.findOne({ userId: interaction.user.id });
+          if (!userEco || userEco.balance < cost) {
+            return interaction.editReply(`❌ **Fondi Insufficienti!** Servono ${cost} Coins, hai solo ${userEco ? userEco.balance : 0}.`);
+          }
+
+          // Check tier progression
+          const tierOrder = ['bronze', 'silver', 'gold', 'platinum'];
+          const currentIndex = tierOrder.indexOf(currentTier);
+          const targetIndex = tierOrder.indexOf(targetTier);
+
+          if (targetIndex !== currentIndex + 1) {
+            return interaction.editReply(`❌ Devi sbloccare i tier in ordine! Attualmente sei **${currentTier.toUpperCase()}**.`);
+          }
+
+          // Check objectives
+          const stats = guildConfig.economy.tierStats || {};
+          const accountAgeDays = userEco.createdAt ? Math.floor((Date.now() - userEco.createdAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+
+          let objectivesFailed = [];
+
+          if (targetTier === 'silver') {
+            if (stats.totalPartnerships < 10) objectivesFailed.push(`Partnership: ${stats.totalPartnerships}/10`);
+            if (accountAgeDays < 30) objectivesFailed.push(`Attività: ${accountAgeDays}/30 giorni`);
+            if (stats.rejectedLast15Days > 0) objectivesFailed.push(`Rifiuti ultimi 15gg: ${stats.rejectedLast15Days}/0`);
+            // Trust score check would go here
+          } else if (targetTier === 'gold') {
+            if (stats.totalPartnerships < 30) objectivesFailed.push(`Partnership: ${stats.totalPartnerships}/30`);
+            if (stats.activePartnerships < 15) objectivesFailed.push(`Partnership attive: ${stats.activePartnerships}/15`);
+            if (accountAgeDays < 60) objectivesFailed.push(`Attività: ${accountAgeDays}/60 giorni`);
+            if (stats.rejectedLast30Days > 0) objectivesFailed.push(`Rifiuti ultimi 30gg: ${stats.rejectedLast30Days}/0`);
+
+            const silverDays = stats.silverUnlockedAt ? Math.floor((Date.now() - stats.silverUnlockedAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+            if (silverDays < 20) objectivesFailed.push(`Giorni da Silver unlock: ${silverDays}/20`);
+          } else if (targetTier === 'platinum') {
+            if (stats.totalPartnerships < 75) objectivesFailed.push(`Partnership: ${stats.totalPartnerships}/75`);
+            if (stats.activePartnerships < 30) objectivesFailed.push(`Partnership attive: ${stats.activePartnerships}/30`);
+            if (accountAgeDays < 120) objectivesFailed.push(`Attività: ${accountAgeDays}/120 giorni`);
+            if (stats.rejectedLast60Days > 0) objectivesFailed.push(`Rifiuti ultimi 60gg: ${stats.rejectedLast60Days}/0`);
+            if (userEco.totalEarned < 5000) objectivesFailed.push(`Coins lifetime: ${userEco.totalEarned}/5000`);
+
+            const goldDays = stats.goldUnlockedAt ? Math.floor((Date.now() - stats.goldUnlockedAt.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+            if (goldDays < 30) objectivesFailed.push(`Giorni da Gold unlock: ${goldDays}/30`);
+          }
+
+          if (objectivesFailed.length > 0) {
+            return interaction.editReply(`❌ **Obiettivi Non Completati!**\n\n${objectivesFailed.map(o => `• ${o}`).join('\n')}\n\nCompleta tutti gli obiettivi prima di acquistare questo tier.`);
+          }
+
+          // All checks passed - unlock tier!
+          userEco.balance -= cost;
+          userEco.transactions.push({
+            type: 'SPEND',
+            amount: cost,
+            reason: `Tier Upgrade: ${targetTier}`
+          });
+          await userEco.save();
+
+          guildConfig.economy.tier = targetTier;
+          guildConfig.economy.tierUnlockedAt = new Date();
+
+          if (targetTier === 'silver') guildConfig.economy.tierStats.silverUnlockedAt = new Date();
+          else if (targetTier === 'gold') guildConfig.economy.tierStats.goldUnlockedAt = new Date();
+
+          await guildConfig.save();
+
+          const tierEmojis = { silver: '🥈', gold: '🥇', platinum: '💎' };
+          await interaction.editReply(`${tierEmojis[targetTier]} **TIER UPGRADE COMPLETATO!**\n\nSei ora **${targetTier.toUpperCase()}**!\nNuovi vantaggi sbloccati. Usa \`/stats\` per vederli!`);
         }
       }
       else {

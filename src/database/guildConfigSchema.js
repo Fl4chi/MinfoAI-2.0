@@ -34,8 +34,26 @@ const guildConfigSchema = new mongoose.Schema({
   },
   // Economy System
   economy: {
-    balance: { type: Number, default: 0 }, // Coins earned by the server
+    balance: { type: Number, default: 0 },
     totalEarned: { type: Number, default: 0 },
+    // Tier System
+    tier: {
+      type: String,
+      enum: ['bronze', 'silver', 'gold', 'platinum'],
+      default: 'bronze'
+    },
+    tierUnlockedAt: { type: Date, default: null },
+    // Tier Objectives Tracking
+    tierStats: {
+      totalPartnerships: { type: Number, default: 0 },
+      activePartnerships: { type: Number, default: 0 },
+      rejectedLast15Days: { type: Number, default: 0 },
+      rejectedLast30Days: { type: Number, default: 0 },
+      rejectedLast60Days: { type: Number, default: 0 },
+      silverUnlockedAt: { type: Date, default: null },
+      goldUnlockedAt: { type: Date, default: null }
+    },
+    // Boost System
     boostActive: { type: Boolean, default: false },
     boostExpiresAt: { type: Date, default: null }
   },
