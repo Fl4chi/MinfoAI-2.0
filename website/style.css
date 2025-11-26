@@ -59,22 +59,6 @@ nav {
     letter-spacing: -1px;
     background: linear-gradient(to right, #fff, #c4b5fd);
     -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: flex;
-    align-items: center;
-}
-
-.logo-img {
-    width: 40px;
-    height: 40px;
-    margin-right: 12px;
-    filter: brightness(0) invert(1);
-}
-
-.version {
-    font-size: 0.7rem;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
     padding: 0.2rem 0.6rem;
     border-radius: 20px;
     color: white;
