@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Fl4chi/MinfoAI-2.0/main/.github/logo.svg" alt="MinfoAI Logo" width="200"/>
 
 # MinfoAI 2.0
 
