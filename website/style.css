@@ -34,62 +34,8 @@ body {
     width: 100vw;
     height: 100vh;
     background:
-        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
-    z-index: -1;
-    pointer-events: none;
-}
-
-/* Logo watermark */
-.logo-watermark {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    opacity: 0.4;
-    transition: opacity 0.3s;
-}
-
-.logo-watermark:hover {
-    opacity: 0.8;
-}
-
-.logo-watermark img {
-    width: 50px;
-    height: 50px;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 5%;
-    backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
     background: rgba(5, 5, 7, 0.7);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(to right, #fff, #c4b5fd);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: flex;
-    align-items: center;
-}
-
-.version {
-    font-size: 0.7rem;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
     color: white;
     -webkit-text-fill-color: white;
     vertical-align: middle;
@@ -435,25 +381,6 @@ footer {
     }
 
     nav {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .links {
-        display: none;
-    }
-
-    .logo-watermark img {
-        width: 35px;
-        height: 35px;
-    }
-
-    .section-subtitle {
-        font-size: 1rem;
-        padding: 0 1rem;
-    }
-
-    .cta-group {
         flex-direction: column;
     }
 }
