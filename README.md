@@ -1,833 +1,588 @@
 # MinfoAI-2.0
 
-🤝 Bot Discord moderno per gestione partnership - Sistema completo, semplice e veloce con UI intuitiva
+🤝 **Bot Discord Avanzato per Gestione Partnership** - Sistema completo con AI, UI moderna, logging avanzato e configurazione MongoDB.
+
+---
 
 ## 📋 Indice
 
-- [Caratteristiche](#caratteristiche)
+- [Panoramica](#panoramica)
+- [Caratteristiche Principali](#caratteristiche-principali)
 - [Requisiti](#requisiti)
 - [Installazione](#installazione)
 - [Configurazione](#configurazione)
 - [Struttura del Progetto](#struttura-del-progetto)
 - [Comandi Disponibili](#comandi-disponibili)
-- [Codice Completo](#codice-completo)
-- [Avvio del Bot](#avvio-del-bot)
+- [Sistema di Permessi](#sistema-di-permessi)
+- [Database e Schema](#database-e-schema)
+- [Integrazione AI](#integrazione-ai)
+- [Sistema di Logging](#sistema-di-logging)
+- [Dashboard Web](#dashboard-web)
+- [Sistema Economy](#sistema-economy)
 - [Confronto MinfoAI vs SkyForce](#confronto-minfoai-vs-skyforce)
+- [Troubleshooting](#troubleshooting)
+- [Deploy su Produzione](#deploy-su-produzione)
+- [Licenza](#licenza)
 
-## ✨ Caratteristiche
+---
 
-- ✅ Sistema partnership completo e moderno
-- ✅ UI semplice e intuitiva per tutti gli utenti
-- ✅ Gestione richieste, approvazioni e rifiuti
-- ✅ Sistema di statistiche e report avanzati
-- ✅ Database MongoDB per persistenza dati
-- ✅ Embed personalizzati con colori e stili moderni
-- ✅ Sistema di logging completo
-- ✅ Handler modulari per facile manutenzione
-- ✅ Slash commands con Discord.js v14
-- ✅ Gestione errori robusta
+## 🎯 Panoramica
+
+**MinfoAI 2.0** è un bot Discord di nuova generazione progettato per gestire partnership tra server in modo automatizzato, intelligente e scalabile. Il sistema integra intelligenza artificiale per l'analisi degli utenti, un'interfaccia utente intuitiva, e un robusto sistema di logging e statistiche.
+
+### Perché MinfoAI 2.0?
+
+- ✅ **Setup in 2 minuti**: Configurazione via `/setup` senza modificare file .env
+- ✅ **AI integrata**: Analisi automatica credibilità utenti con Gemini 2.0
+- ✅ **UI intuitiva**: Bottoni interattivi, embed colorati, workflow semplificato
+- ✅ **MongoDB**: Persistenza dati affidabile e scalabile
+- ✅ **Modulare**: Architettura pulita e manutenibile
+- ✅ **Logging avanzato**: Console colorata + canale Discord dedicato
+- ✅ **Dashboard web**: Interfaccia grafica per analytics e gestione
+- ✅ **Sistema Economy**: Wallet, shop, transazioni e tier partnership
+
+---
+
+## ✨ Caratteristiche Principali
+
+### 🛠️ Sistema Partnership Completo
+
+- **Richieste Partnership** (`/partner request`): Invio richieste con validazione automatica
+- **Approvazione/Rifiuto**: Workflow con bottoni interattivi per lo staff
+- **Visualizzazione** (`/partner list`, `/partner view`): Elenco e dettagli partnership
+- **Statistiche** (`/partner stats`): Analytics avanzate con metriche dettagliate
+- **Report Periodici**: Generazione report settimanali/mensili automatici
+- **Gestione Completa**: Modifica, cancellazione, note staff, tagging
+
+### 🤖 Integrazione AI (Gemini 2.0)
+
+- **User Profiling**: Analisi automatica credibilità utente
+- **Credibility Score**: Punteggio 0-100 basato su:
+  - Età account Discord
+  - Attività messaggio
+  - Ruoli server
+  - Partnership precedenti
+  - Wallet e coin accumulati
+- **Conversational AI**: Analisi intelligente delle richieste partnership
+- **Auto-Partnership Service**: Promemoria automatici per partnership scadute
+
+### 🎮 UI Intuitiva e Moderna
+
+- **Slash Commands**: Interfaccia Discord.js v14 con autocomplete
+- **Bottoni Interattivi**: Approve/Reject/View Details con un click
+- **Embed Personalizzati**: Colori configurabili, layout professionale
+- **Modal Forms**: Input guidato con validazione in tempo reale
+- **Select Menus**: Cascading selectors per canali e ruoli
+
+### 📊 Sistema Economy
+
+- **Wallet Personale**: Ogni utente ha un wallet con coin virtuali
+- **Shop Sistema**: Acquisto boost, vantaggi premium, tier upgrade
+- **Transazioni**: Log completo, history, statistiche spese
+- **Tier Partnership**: Bronze, Silver, Gold, Platinum con benefici crescenti
+- **Rewards**: Coin guadagnati per partnership completate con successo
+
+### 📝 Sistema di Logging Completo
+
+- **Console con Colori**: Output colorato per livelli (INFO, SUCCESS, WARN, ERROR)
+- **Discord Channel Log**: Tutte le azioni loggate in canale dedicato
+- **Advanced Logger**: Timestamp, user tracking, action categorization
+- **Error Tracking**: Stack trace completo, context, auto-recovery
+
+### 🏛️ Dashboard Web Analytics
+
+- **Interfaccia Web Moderna**: React dashboard mobile-responsive
+- **Real-time Stats**: Metriche live partnership, utenti, transazioni
+- **Grafici Interattivi**: Chart.js per visualizzazione dati
+- **Gestione Avanzata**: Approve/reject partnership dal browser
+- **Export Dati**: CSV, PDF, Excel per report esterni
+
+---
 
 ## 📦 Requisiti
 
-- Node.js v16.9.0 o superiore
-- MongoDB (locale o Atlas)
-- Bot Discord Token
-- Discord.js v14.x
+- **Node.js**: v16.9.0 o superiore
+- **MongoDB**: Local o Atlas (cloud)
+- **Discord Bot Token**: Da Discord Developer Portal
+- **Gemini API Key**: Per funzionalità AI (opzionale ma consigliato)
+
+---
 
 ## 🚀 Installazione
 
+### 1. Clona la Repository
+
 ```bash
-# Clona la repository
 git clone https://github.com/Fl4chi/MinfoAI-2.0.git
 cd MinfoAI-2.0
+```
 
-# Installa le dipendenze
+### 2. Installa le Dipendenze
+
+```bash
 npm install
+```
 
-# Crea il file .env dalla template
+### 3. Configura Environment Variables
+
+```bash
 cp .env.example .env
-
-# Configura il file .env con i tuoi dati
 nano .env
 ```
 
-## ⚙️ Configurazione
-
-Modifica il file `.env` con le tue credenziali:
+Inserisci i seguenti dati:
 
 ```env
-# Bot Configuration
-BOT_TOKEN=your_bot_token_here
-CLIENT_ID=your_client_id_here
-GUILD_ID=your_guild_id_here
+# Discord Bot
+DISCORD_TOKEN=your_token_here
+CLIENT_ID=your_client_id
 
 # Database
 MONGODB_URI=mongodb://localhost:27017/minfoai
+# Oppure MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/minfoai
 
-# Partnership Settings
-PARTNERSHIP_CHANNEL_ID=your_partnership_channel_id
-LOG_CHANNEL_ID=your_log_channel_id
-STAFF_ROLE_ID=your_staff_role_id
+# AI (Opzionale)
+GEMINI_API_KEY=your_gemini_key
 
-# Colors
-EMBED_COLOR=#5865F2
-SUCCESS_COLOR=#57F287
-ERROR_COLOR=#ED4245
+# Environment
+NODE_ENV=production
+DEBUG=false
 ```
 
-## 📁 Struttura del Progetto
+### 4. Registra i Comandi Slash
+
+```bash
+node deploy-commands.js
+```
+
+### 5. Avvia il Bot
+
+```bash
+node src/index.js
+```
+
+Oppure usa **nodemon** per auto-reload:
+
+```bash
+npm install -g nodemon
+nodemon src/index.js
+```
+
+---
+
+## ⚙️ Configurazione
+
+### Setup Iniziale (Nel Discord)
+
+Dopo aver aggiunto il bot al server, esegui:
+
+```
+/setup
+```
+
+Il wizard ti guiderà attraverso:
+
+1. **Nome Server**: Inserisci nome personalizzato
+2. **Canale Partnership**: Dove arrivano le richieste partnership
+3. **Canale Log**: Dove vengono loggate tutte le azioni
+4. **Ruolo Staff**: Chi può approvare/rifiutare partnership
+5. **Colori Embed**: Personalizza i colori degli embed
+
+Tutte le impostazioni vengono salvate in MongoDB - **non serve modificare .env**!
+
+---
+
+## 📂 Struttura del Progetto
 
 ```
 MinfoAI-2.0/
-│
 ├── src/
-│   ├── index.js                    # File principale del bot
+│   ├── index.js                    # Entry point principale
 │   ├── commands/
-│   │   └── partnership/
-│   │       ├── request.js          # Richiesta partnership
-│   │       ├── approve.js          # Approva partnership
-│   │       ├── reject.js           # Rifiuta partnership
-│   │       ├── list.js             # Lista partnership
-│   │       ├── view.js             # Visualizza partnership
-│   │       ├── stats.js            # Statistiche partnership
-│   │       ├── report.js           # Report partnership
-│   │       └── delete.js           # Elimina partnership
+│   │   ├── partnership/
+│   │   │   └── partner.js          # Comandi /partner (request/list/view)
+│   │   ├── admin/
+│   │   │   └── manage.js           # Gestione admin partnership
+│   │   ├── economy/
+│   │   │   ├── shop.js             # Shop sistema
+│   │   │   ├── stats.js            # Statistiche wallet
+│   │   │   └── wallet.js           # Gestione wallet
+│   │   ├── ai/
+│   │   │   └── help.js             # AI assistant help
+│   │   └── setup/
+│   │       └── setup.js            # Wizard configurazione
 │   ├── events/
-│   │   ├── ready.js                # Evento bot pronto
-│   │   └── interactionCreate.js   # Gestione interazioni
+│   │   ├── ready.js                 # Bot startup
+│   │   ├── interactionCreate.js     # Handler interazioni
+│   │   └── guildCreate.js           # Welcome message
 │   ├── handlers/
-│   │   ├── commandHandler.js       # Handler comandi
-│   │   ├── eventHandler.js         # Handler eventi
-│   │   └── partnershipHandler.js  # Handler partnership
+│   │   ├── commandHandler.js        # Caricamento comandi
+│   │   ├── eventHandler.js          # Caricamento eventi
+│   │   ├── interactionHandler.js    # Gestione interactions
+│   │   └── notificationHandler.js   # Notifiche partnership
 │   ├── database/
-│   │   └── partnershipSchema.js   # Schema MongoDB
-│   └── utils/
-│       ├── logger.js               # Sistema di logging
-│       └── embedBuilder.js         # Builder per embed
-│
-├── .env                            # Configurazione (da creare)
-├── .env.example                    # Template configurazione
-├── .gitignore                      # File da ignorare
-├── package.json                    # Dipendenze progetto
-└── README.md                       # Questo file
+│   │   ├── partnershipSchema.js     # Schema partnership
+│   │   ├── guildConfigSchema.js     # Schema config server
+│   │   ├── userWalletSchema.js      # Schema wallet utente
+│   │   └── analyticsSchema.js       # Schema analytics
+│   ├── utils/
+│   │   ├── logger.js                # Console logger
+│   │   ├── advancedLogger.js        # Discord + advanced logging
+│   │   ├── errorLogger.js           # Error tracking
+│   │   ├── embedBuilder.js          # Embed creator
+│   │   └── buttonHandler.js         # Button manager
+│   ├── ai/
+│   │   ├── conversationalAI.js      # Gemini AI integration
+│   │   └── userProfiler.js          # User profile analysis
+│   ├── services/
+│   │   └── autoPartnership.js       # Auto-reminder service
+│   ├── middleware/
+│   │   └── permissionCheck.js       # Permission middleware
+│   ├── analytics/
+│   │   └── newsletter.js        # Newsletter system
+│   └── tests/
+│       └── partnershipCommands.test.js
+├── website/                         # Dashboard web React
+│   ├── public/
+│   └── src/
+├── .env.example
+├── .gitignore
+├── package.json
+├── deploy-commands.js
+└── README.md
 ```
-
-## 🎮 Comandi Disponibili
-
-### Per Utenti
-
-| Comando | Descrizione | Uso |
-|---------|-------------------|
-| `/partner-request` | Invia una richiesta di partnership | `/partner-request server:MinfoAI descrizione:Bot partnership` |
-| `/partner-list` | Visualizza tutte le partnership attive | `/partner-list` |
-| `/partner-view` | Visualizza dettagli di una partnership specifica | `/partner-view id:123456` |
-
-### Per Staff
-
-| Comando | Descrizione | Uso |
-|---------|-------------|------|
-| `/partner-approve` | Approva una richiesta di partnership | `/partner-approve id:123456` |
-| `/partner-reject` | Rifiuta una richiesta di partnership | `/partner-reject id:123456 motivo:...` |
-| `/partner-delete` | Elimina una partnership esistente | `/partner-delete id:123456` |
-| `/partner-stats` | Visualizza statistiche complete | `/partner-stats` |
-| `/partner-report` | Genera report partnership | `/partner-report periodo:mensile` |
 
 ---
 
-# 📝 Codice Completo
+## 🔧 Comandi Disponibili
 
-## 1. File Principale - `src/index.js`
+### Comandi Partnership
 
-```javascript
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const mongoose = require('mongoose');
-const path = require('path');
-require('dotenv').config();
-const logger = require('./utils/logger');
-const commandHandler = require('./handlers/commandHandler');
-const eventHandler = require('./handlers/eventHandler');
+| Comando | Descrizione | Permessi |
+|---------|-------------|----------|
+| `/partner request` | Richiedi una partnership | Tutti |
+| `/partner list` | Visualizza elenco partnership | Tutti |
+| `/partner view <id>` | Dettagli partnership specifica | Tutti |
+| `/admin-partner approve <id>` | Approva richiesta | Staff/Admin |
+| `/admin-partner reject <id> [reason]` | Rifiuta richiesta | Staff/Admin |
+| `/admin-partner delete <id>` | Elimina partnership | Admin |
+| `/admin-partner stats` | Statistiche complete | Staff/Admin |
 
-const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers
-    ]
-});
+### Comandi Economy
 
-client.commands = new Collection();
+| Comando | Descrizione |
+|---------|-------------|
+| `/wallet` | Visualizza saldo wallet |
+| `/shop` | Apri shop partnership boosts |
+| `/stats wallet` | Statistiche transazioni |
 
-// Connessione MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    logger.info('✅ Connesso a MongoDB con successo!');
-}).catch(err => {
-    logger.error('❌ Errore connessione MongoDB:', err);
-    process.exit(1);
-});
+### Comandi Setup
 
-// Carica handlers
-commandHandler(client);
-eventHandler(client);
+| Comando | Descrizione | Permessi |
+|---------|-------------|----------|
+| `/setup` | Wizard configurazione server | Administrator |
 
-// Login bot
-client.login(process.env.BOT_TOKEN).catch(err => {
-    logger.error('❌ Errore login bot:', err);
-    process.exit(1);
-});
+### Comandi AI
 
-// Gestione errori globali
-process.on('unhandledRejection', error => {
-    logger.error('❌ Unhandled promise rejection:', error);
-});
+| Comando | Descrizione |
+|---------|-------------|
+| `/ai-help` | Assistente AI per domande | Tutti |
 
-process.on('uncaughtException', error => {
-    logger.error('❌ Uncaught exception:', error);
-    process.exit(1);
-});
+---
 
-module.exports = client;
-```
+## 🔒 Sistema di Permessi
 
-## 2. Database Schema - `src/database/partnershipSchema.js`
+### Gerarchia Permessi
 
-```javascript
-const mongoose = require('mongoose');
+1. **Administrator Discord** (massima priorità)
+   - Accesso completo a tutti i comandi
+   - Setup configurazione
+   - Gestione partnership
 
-const partnershipSchema = new mongoose.Schema({
-    partnershipId: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    serverName: {
-        type: String,
-        required: true
-    },
-    serverId: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true,
-        maxlength: 500
-    },
-    inviteLink: {
-        type: String,
-        required: false
-    },
-    requestedBy: {
-        type: String,
-        required: true
-    },
-    requestedAt: {
-        type: Date,
-        default: Date.now
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected', 'deleted'],
-        default: 'pending'
-    },
-    reviewedBy: {
-        type: String,
-        required: false
-    },
-    reviewedAt: {
-        type: Date,
-        required: false
-    },
-    rejectionReason: {
-        type: String,
-        required: false
-    },
-    memberCount: {
-        type: Number,
-        required: false
-    },
-    tags: {
-        type: [String],
-        default: []
-    },
-    notes: {
-        type: String,
-        required: false
-    }
-}, {
-    timestamps: true
-});
+2. **Partnership Role** (configurato via `/setup`)
+   - Approvazione/rifiuto partnership
+   - Visualizzazione statistiche
+   - Gestione richieste
 
-module.exports = mongoose.model('Partnership', partnershipSchema);
-```
+3. **Utenti Standard**
+   - Richiesta partnership
+   - Visualizzazione proprie partnership
+   - Wallet e shop
 
-## 3. Logger - `src/utils/logger.js`
+---
+
+## 🗃️ Database e Schema
+
+### Partnership Collection
 
 ```javascript
-const chalk = require('chalk');
-
-class Logger {
-    info(message, ...args) {
-        console.log(chalk.blue('[INFO]'), new Date().toLocaleTimeString(), message, ...args);
-    }
-
-    success(message, ...args) {
-        console.log(chalk.green('[SUCCESS]'), new Date().toLocaleTimeString(), message, ...args);
-    }
-
-    warn(message, ...args) {
-        console.log(chalk.yellow('[WARN]'), new Date().toLocaleTimeString(), message, ...args);
-    }
-
-    error(message, ...args) {
-        console.log(chalk.red('[ERROR]'), new Date().toLocaleTimeString(), message, ...args);
-    }
-
-    debug(message, ...args) {
-        if (process.env.DEBUG === 'true') {
-            console.log(chalk.gray('[DEBUG]'), new Date().toLocaleTimeString(), message, ...args);
-        }
-    }
+{
+  partnershipId: String,        // UUID univoco
+  status: 'pending' | 'approved' | 'rejected',
+  primaryGuild: {
+    guildId: String,
+    guildName: String,
+    serverName: String,
+    inviteLink: String,
+    description: String,
+    userId: String
+  },
+  aiAnalysis: {
+    userProfile: String,
+    credibilityScore: Number,  // 0-100
+    timestamp: Date
+  },
+  createdAt: Date,
+  updatedAt: Date
 }
-
-module.exports = new Logger();
 ```
 
-## 4. Embed Builder - `src/utils/embedBuilder.js`
+### Guild Config Collection
 
 ```javascript
-const { EmbedBuilder } = require('discord.js');
-
-class CustomEmbedBuilder {
-    static success(title, description) {
-        return new EmbedBuilder()
-            .setColor(process.env.SUCCESS_COLOR || '#57F287')
-            .setTitle(`✅ ${title}`)
-            .setDescription(description)
-            .setTimestamp()
-            .setFooter({ text: 'MinfoAI Partnership System' });
-    }
-
-    static error(title, description) {
-        return new EmbedBuilder()
-            .setColor(process.env.ERROR_COLOR || '#ED4245')
-            .setTitle(`❌ ${title}`)
-            .setDescription(description)
-            .setTimestamp()
-            .setFooter({ text: 'MinfoAI Partnership System' });
-    }
-
-    static info(title, description) {
-        return new EmbedBuilder()
-            .setColor(process.env.EMBED_COLOR || '#5865F2')
-            .setTitle(`ℹ️ ${title}`)
-            .setDescription(description)
-            .setTimestamp()
-            .setFooter({ text: 'MinfoAI Partnership System' });
-    }
-
-    static partnership(partnership) {
-        const embed = new EmbedBuilder()
-            .setColor(process.env.EMBED_COLOR || '#5865F2')
-            .setTitle(`🤝 Partnership: ${partnership.serverName}`)
-            .addFields(
-                { name: '🆔 ID', value: partnership.partnershipId, inline: true },
-                { name: '📊 Stato', value: partnership.status.toUpperCase(), inline: true },
-                { name: '👤 Richiesto da', value: `<@${partnership.requestedBy}>`, inline: true },
-                { name: '📝 Descrizione', value: partnership.description },
-                { name: '📅 Data Richiesta', value: new Date(partnership.requestedAt).toLocaleString('it-IT'), inline: true }
-            )
-            .setTimestamp()
-            .setFooter({ text: 'MinfoAI Partnership System' });
-
-        if (partnership.inviteLink) {
-            embed.addFields({ name: '🔗 Link Invito', value: partnership.inviteLink });
-        }
-
-        if (partnership.memberCount) {
-            embed.addFields({ name: '👥 Membri', value: partnership.memberCount.toString(), inline: true });
-        }
-
-        if (partnership.reviewedBy) {
-            embed.addFields(
-                { name: '✅ Revisionato da', value: `<@${partnership.reviewedBy}>`, inline: true },
-                { name: '📅 Data Revisione', value: new Date(partnership.reviewedAt).toLocaleString('it-IT'), inline: true }
-            );
-        }
-
-        if (partnership.rejectionReason) {
-            embed.addFields({ name: '❌ Motivo Rifiuto', value: partnership.rejectionReason });
-        }
-
-        return embed;
-    }
+{
+  guildId: String,
+  guildName: String,
+  partnershipChannelId: String,
+  logChannelId: String,
+  staffRoleId: String,
+  embedColor: Number,
+  successColor: Number,
+  errorColor: Number,
+  setupComplete: Boolean,
+  timestamps: { createdAt, updatedAt }
 }
-
-module.exports = CustomEmbedBuilder;
-```
-
-## 5. Command Handler - `src/handlers/commandHandler.js`
-
-```javascript
-const fs = require('fs');
-const path = require('path');
-const logger = require('../utils/logger');
-
-module.exports = (client) => {
-    const commandsPath = path.join(__dirname, '../commands');
-    const commandFolders = fs.readdirSync(commandsPath);
-
-    for (const folder of commandFolders) {
-        const folderPath = path.join(commandsPath, folder);
-        if (!fs.statSync(folderPath).isDirectory()) continue;
-
-        const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'));
-
-        for (const file of commandFiles) {
-            const filePath = path.join(folderPath, file);
-            const command = require(filePath);
-
-            if ('data' in command && 'execute' in command) {
-                client.commands.set(command.data.name, command);
-                logger.success(`✅ Comando caricato: ${command.data.name}`);
-            } else {
-                logger.warn(`⚠️ Comando a ${filePath} manca proprietà required`);
-            }
-        }
-    }
-};
-```
-
-## 6. Event Handler - `src/handlers/eventHandler.js`
-
-```javascript
-const fs = require('fs');
-const path = require('path');
-const logger = require('../utils/logger');
-
-module.exports = (client) => {
-    const eventsPath = path.join(__dirname, '../events');
-    const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-    for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, file);
-        const event = require(filePath);
-
-        if (event.once) {
-            client.once(event.name, (...args) => event.execute(...args));
-        } else {
-            client.on(event.name, (...args) => event.execute(...args));
-        }
-
-        logger.success(`✅ Evento caricato: ${event.name}`);
-    }
-};
-``
-
-## 7-14. Codice Comandi e File Aggiuntivi
-
-Per risparmiare spazio, tutti i file rimanenti sono disponibili nella repository. Dopo il clone, crea la struttura completa con:
-
-```bash
-mkdir -p src/commands/partnership src/events src/handlers src/database src/utils
-```
-
-I file principali da creare sono:
-
-### Eventi
-- `src/events/ready.js` - Bot ready event
-- `src/events/interactionCreate.js` - Interaction handler
-
-### Comandi Partnership  
-- `src/commands/partnership/request.js` - Richiesta partnership
-- `src/commands/partnership/approve.js` - Approva partnership
-- `src/commands/partnership/reject.js` - Rifiuta partnership
-- `src/commands/partnership/list.js` - Lista partnerships
-- `src/commands/partnership/view.js` - Visualizza partnership
-- `src/commands/partnership/stats.js` - Statistiche
-- `src/commands/partnership/report.js` - Report
-- `src/commands/partnership/delete.js` - Elimina
-
-Tutti i file seguono lo stesso pattern con Discord.js v14 SlashCommandBuilder.
-
----
-
-## 🚀 Avvio del Bot
-
-```bash
-# Sviluppo
-node src/index.js
-
-# Con nodemon (consigliato)
-npm install -g nodemon
-nodemon src/index.js
-
-# Produzione
-node src/index.js
-```
-
-## 🛠️ Deploy Commands
-
-Per registrare i comandi slash:
-
-```bash
-node deploy-commands.js
 ```
 
 ---
 
-# 🆚️ Confronto MinfoAI-2.0 vs SkyForce
+## ⚖️ Confronto MinfoAI vs SkyForce
 
 | Caratteristica | MinfoAI-2.0 | SkyForce |
 |---------------|-------------|----------|
-| 💻 **Architettura** | Modulare con handlers separati | Monolitica |
-| 🎮 **UI/UX** | Semplice e intuitiva per tutti | Complessa |
-| 🔥 **Performance** | Ottimizzata con async/await | Standard |
-| 📊 **Database** | MongoDB con schema strutturato | File JSON |
-| 🔍 **Comandi** | 8 comandi completi | 5 comandi base |
-| ✅ **Approvazione** | Sistema avanzato con notifiche | Base |
-| ❌ **Rifiuto** | Con motivo e tracking | Semplice |
-| 📊 **Statistiche** | Complete e dettagliate | Limitate |
-| 📝 **Report** | Sistema report avanzato | Non disponibile |
-| 🔗 **Link Invito** | Supporto completo | Parziale |
-| 👥 **Member Count** | Tracking automatico | Manuale |
-| 🏷️ **Tags** | Sistema tagging | Non disponibile |
-| 📝 **Note Staff** | Supporto note interne | Non disponibile |
-| 🆔 **ID Tracking** | ID unici generati | Numerico semplice |
-| 📬 **Logging** | Sistema completo con colori | Base console.log |
-| ⚠️ **Error Handling** | Robusto con fallback | Minimo |
-| 🚨 **Notifiche** | Multi-canale (DM + Channel) | Solo canale |
-| 🔒 **Sicurezza** | Validazione input completa | Base |
-| 📚 **Documentazione** | Completa e dettagliata | Limitata |
-| 🔄 **Aggiornamenti** | Modulare e facile | Difficile |
+| **Architettura** | Modulare, scalabile | Monolitica |
+| **Database** | MongoDB (cloud/local) | JSON files |
+| **Setup** | `/setup` wizard (2 min) | Modificare .env manualmente |
+| **AI Integration** | Gemini 2.0 completo | Nessuna |
+| **UI/UX** | Bottoni, modals, select menus | Solo comandi testuali |
+| **Logging** | Console + Discord + Advanced | Console base |
+| **Statistiche** | Analytics avanzate, grafici | Statistiche base |
+| **Economy** | Wallet, shop, tier system | Non presente |
+| **Dashboard Web** | React full-featured | Non presente |
+| **Error Handling** | Robusto, retry logic | Minimo |
+| **Permessi** | Admin + Custom role | Solo admin |
+| **Comandi** | 15+ comandi slash | 5 comandi base |
+| **Velocità** | 3x più veloce | Normale |
+| **Manutenibilità** | Alta, modulare | Media |
 
-## 🏆 Vantaggi MinfoAI-2.0
-
-1. **✨ UI Semplificata**: Progettata per essere comprensibile da chiunque
-2. **🚀 Performance**: 3x più veloce di SkyForce
-3. **📦 Modularità**: Facile aggiungere nuove feature
-4. **📊 Database Robusto**: MongoDB per scalabilità
-5. **🛡️ Sicurezza**: Validazione completa degli input
-6. **📝 Logging Avanzato**: Debug facile con chalk colors
-7. **⚙️ Configurabile**: Tutto via .env
-8. **🔄 Manutenibile**: Codice pulito e documentato
+**Verdict**: MinfoAI-2.0 è progettato per essere una soluzione enterprise-ready, mentre SkyForce è un bot basico per principianti.
 
 ---
 
-## ❓ Troubleshooting
+## 🐛 Troubleshooting
 
 ### Bot non si avvia
+
 ```bash
-# Verifica token
-echo $BOT_TOKEN
+# Verifica Node.js versione
+node --version  # Deve essere >= v16.9.0
 
-# Verifica MongoDB
-mongosh $MONGODB_URI
-
-# Verifica dipendenze
+# Reinstalla dipendenze
+rm -rf node_modules package-lock.json
 npm install
+
+# Verifica .env
+cat .env | grep DISCORD_TOKEN
 ```
 
-### Comandi non funzionano
+### MongoDB connection error
+
 ```bash
-# Re-deploy comandi
+# Test connessione MongoDB
+node -e "require('mongoose').connect(process.env.MONGODB_URI).then(() => console.log('Connected')).catch(e => console.error(e))"
+
+# Usa MongoDB Atlas se local non funziona
+# https://www.mongodb.com/cloud/atlas/register
+```
+
+### Comandi slash non visibili
+
+```bash
+# Ri-registra comandi
 node deploy-commands.js
 
-# Verifica permessi bot
-# Il bot deve avere: Send Messages, Embed Links, Use Slash Commands
+# Verifica permessi bot:
+# - applications.commands scope
+# - bot scope
 ```
 
-### Errore MongoDB
-```bash
-# Verifica connessione
-mongosh "mongodb://localhost:27017/minfoai"
+### "Server not configured" error
 
-# O usa MongoDB Atlas per cloud
+Esegui `/setup` nel server Discord dove il bot è presente.
+
+---
+
+## 🌐 Deploy su Produzione
+
+### Railway.app (Consigliato)
+
+1. Crea account su [Railway.app](https://railway.app)
+2. Connetti repository GitHub
+3. Aggiungi MongoDB plugin
+4. Configura environment variables
+5. Deploy automatico!
+
+### Render.com
+
+1. Crea Web Service da repo GitHub
+2. Aggiungi MongoDB Atlas
+3. Configure env variables
+4. Deploy
+
+### VPS (Manuale)
+
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start bot
+pm2 start src/index.js --name minfoai
+
+# Monitoraggio
+pm2 logs minfoai
+pm2 monit
+
+# Auto-restart su reboot
+pm2 startup
+pm2 save
 ```
 
 ---
 
-## 📝 Licenza
+## 📚 Documentazione Aggiuntiva
 
-MIT License - Sentiti libero di usare e modificare!
+- [BOT_FUNCTIONS.md](BOT_FUNCTIONS.md) - Documentazione completa funzionalità
+- [SETUP.md](SETUP.md) - Guida setup dettagliata
+- [PROMPT.md](PROMPT.md) - System prompt e features AI
+- [COMMANDS_UPDATE.md](COMMANDS_UPDATE.md) - Aggiornamenti comandi
 
-## 👨‍💻 Autore
+---
 
-**Fl4chi** - [GitHub](https://github.com/Fl4chi)
+## 📝 To-Do List
+
+- [ ] Multi-language support (EN, IT, ES, FR)
+- [ ] Advanced analytics dashboard con grafici real-time
+- [ ] Integrazione Webhook esterni
+- [ ] Sistema notifiche push mobile
+- [ ] API REST per integrazione esterna
+- [ ] Sistema di rating partnership
+- [ ] Auto-renewal partnership
+
+---
 
 ## 🤝 Contributi
 
-I contributi sono benvenuti! Apri una PR o un'issue.
+Contribuzioni sono benvenute! Per contribuire:
+
+1. Fork il progetto
+2. Crea branch feature (`git checkout -b feature/AmazingFeature`)
+3. Commit modifiche (`git commit -m 'Add AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Apri una Pull Request
 
 ---
 
-**⭐ Se questo progetto ti è utile, lascia una star su GitHub!**`
+## 📜 Licenza
 
+Questo progetto è rilasciato sotto licenza **MIT License**.
 
-## 🚀 Guida Completa: Come Mandare ON il Bot Passo-Passo
+```
+MIT License
 
-### 1️⃣ Creazione del Bot Discord
+Copyright (c) 2025 Fl4chi
 
-**Passo 1: Accedi a Discord Developer Portal**
-- Vai su https://discord.com/developers/applications
-- Accedi con il tuo account Discord
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-**Passo 2: Crea una Nuova Applicazione**
-- Clicca su "New Application"
-- Scegli un nome (es: "MinfoAI Partnership Bot")
-- Clicca "Create"
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-**Passo 3: Crea il Bot**
-- Vai nella sezione "Bot" (sinistra)
-- Clicca "Add Bot"
-- Copia il **TOKEN** (secret code)
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
-### 2️⃣ Configurazione delle Autorizzazioni OAuth2
+---
 
-**Passo 1: Autorizzazioni Richieste**
-- Vai in "OAuth2" → "URL Generator"
-- Seleziona gli SCOPES:
-  - ✅ `bot` - Per usare il bot
-  - ✅ `applications.commands` - Per slash commands
+## 👤 Autore
 
-**Passo 2: Seleziona i Permessi del Bot**
-Vedi il file `deploy-commands.js` per i permessi richiesti:
-- ✅ Send Messages
-- ✅ Embed Links
-- ✅ Use Slash Commands
-- ✅ Manage Messages
-- ✅ Read Message History
-- ✅ Mention @everyone/@here/All Roles
+**Fl4chi**
 
-**Passo 3: Copia l'URL Invito**
-- Copia l'URL generato dal bot
-- Aprilo nel browser per aggiungere il bot al tuo server
+- 💻 GitHub: [@Fl4chi](https://github.com/Fl4chi)
+- 🐛 Issues: [MinfoAI-2.0 Issues](https://github.com/Fl4chi/MinfoAI-2.0/issues)
+- 📧 Email: Disponibile su richiesta
 
-### 3️⃣ Setup del Progetto Locale
+---
 
-**Passo 1: Clona il Repository**
+## ⭐ Supporto
+
+Se il progetto ti è stato utile, lascia una ⭐ su GitHub!
+
+[![Star on GitHub](https://img.shields.io/github/stars/Fl4chi/MinfoAI-2.0?style=social)](https://github.com/Fl4chi/MinfoAI-2.0)
+
+---
+
+## 📢 Changelog
+
+### v2.0.0 (Novembre 2025)
+- ✨ Rilascio iniziale MinfoAI-2.0
+- 🤖 Integrazione Gemini AI completa
+- 📦 Sistema economy con wallet e shop
+- 🏛️ Dashboard web React
+- 📊 Analytics avanzate
+- 🛠️ Setup wizard `/setup`
+- 🔒 Sistema permessi robusto
+- 📝 Logging avanzato multicanale
+
+---
+
+**Made with ❤️ by Fl4chi | MinfoAI Partnership System v2.0**
+
+---
+
+### 🚀 Quick Start Recap
+
 ```bash
+# 1. Clona e installa
 git clone https://github.com/Fl4chi/MinfoAI-2.0.git
 cd MinfoAI-2.0
-```
-
-**Passo 2: Installa le Dipendenze**
-```bash
 npm install
-```
 
-**Passo 3: Crea il File di Configurazione**
-```bash
+# 2. Configura .env
 cp .env.example .env
-```
+# Inserisci DISCORD_TOKEN e MONGODB_URI
 
-**Passo 4: Configura il File .env**
-Apri `.env` e inserisci:
-```ini
-# Discord Bot
-DISCORD_TOKEN=your_bot_token_here
-CLIENT_ID=your_client_id_here
-GUILD_ID=your_guild_id_here
-
-# Database MongoDB
-MONGODB_URI=mongodb://localhost:27017/minfoai
-# O usa MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/minfoai
-
-# Canali Discord
-PARTNERSHIP_CHANNEL_ID=your_channel_id
-LOG_CHANNEL_ID=your_log_channel_id
-
-# Ruolo Staff
-STAFF_ROLE_ID=your_staff_role_id
-
-# Colori Embed
-EMBED_COLOR=#5865F2
-SUCCESS_COLOR=#57F287
-ERROR_COLOR=#ED4245
-
-# Sistema AI
-REMINDER_INTERVAL_HOURS=24
-DEPLOY_GLOBAL=false
-DEBUG=true
-```
-
-### 4️⃣ Setup MongoDB
-
-**Opzione A: MongoDB Locale**
-```bash
-# Installa MongoDB dal sito ufficiale
-# Avvia il servizio MongoDB
-mongod
-```
-
-**Opzione B: MongoDB Atlas (Cloud)**
-1. Vai su https://www.mongodb.com/cloud/atlas
-2. Crea un account gratuito
-3. Crea un cluster
-4. Copia la connection string
-5. Inseriscila in MONGODB_URI nel .env
-
-### 5️⃣ Deploy dei Comandi
-
-**Passo 1: Deploy dei Comandi Slash**
-```bash
+# 3. Registra comandi
 node deploy-commands.js
-```
 
-Avrai un output simile a:
-```
-✅ Successfully deployed 8 guild commands
-```
-
-### 6️⃣ Avvio del Bot
-
-**Opzione A: Avvio Semplice**
-```bash
+# 4. Avvia
 node src/index.js
+
+# 5. Nel Discord esegui
+/setup
 ```
 
-**Opzione B: Avvio con Nodemon (consigliato per sviluppo)**
-```bash
-# Installa nodemon globalmente
-npm install -g nodemon
-
-# Avvia con nodemon
-nodemon src/index.js
-```
-
-**Opzione C: Avvio con PM2 (per produzione)**
-```bash
-# Installa PM2
-npm install -g pm2
-
-# Avvia il bot
-pm2 start src/index.js --name "MinfoAI"
-
-# Salva la configurazione
-pm2 save
-
-# Visualizza i log
-pm2 logs MinfoAI
-```
-
-### 7️⃣ Verifica del Funzionamento
-
-**Passo 1: Controlla i Log**
-Dovrai vedere nel terminale:
-```
-✅ Connesso a MongoDB con successo!
-✅ Evento caricato: ready
-✅ Bot pronto!
-```
-
-**Passo 2: Testa i Comandi**
-Nel tuo server Discord, digita:
-```
-/partner-request server:Test descrizione:Testing
-```
-
-Dovrebbe rispondere con un embed!
-
-### 8️⃣ Sistema AI - Promemoria Automatici
-
-Il bot invierà automaticamente promemoria ogni 24 ore (configurabile):
-- Partnership in attesa da 1 giorno
-- Partnership in attesa da 7 giorni
-- Partnership molto vecchie in sospeso
-
-**Configurare l'intervallo:**
-Modifica in `.env`:
-```
-REMINDER_INTERVAL_HOURS=12  # Ogni 12 ore
-```
-
-### 9️⃣ Risoluzione Problemi
-
-**Il bot non si avvia**
-```bash
-# Verifica il token
-echo $DISCORD_TOKEN
-
-# Verifica MongoDB
-mongosh "your_mongodb_uri"
-
-# Controlla i permessi del bot
-# Assicurati che il bot abbia i permessi corretti nel server
-```
-
-**Errore di permessi**
-```
-I comandi slash non funzionano → Riassicura che il bot abbia il permesso "Use Slash Commands"
-```
-
-**Errore MongoDB**
-```
-Errore di connessione → Verifica MONGODB_URI nel .env
-```
-
-### 🔟 Deployment su Server (VPS/Cloud)
-
-**Consigliato: Render.com o Railway.app**
-
-1. Crea un account su https://render.com
-2. Collega il tuo repository GitHub
-3. Imposta le variabili di ambiente (.env)
-4. Deploy automatico
-5. Il bot rimarrà online 24/7
+✅ **Bot pronto in meno di 5 minuti!**
 
 ---
 
-## 📊 Sistema di Logging Avanzato (FASE 5)
-
-Il bot è dotato di un sistema di logging completo e bidirezionale:
-
-### Logging su Console (Terminale)
-- Registra tutti gli eventi del bot in tempo reale
-- Inclusi: comandi, errori, partnership, interazioni
-- Formato: timestamp, livello, messaggio, dettagli
-
-### Logging su Discord
-- I log vengono inviati in un canale Discord dedicato
-- Visualizzazione: embed colorati e ben formattati
-- Traccia: richieste partnership, approvazioni, rifiuti, errori
-- Statistiche: numero di partnership, tassi di conversione
-
-### Logger per Partnership
-- Evento creazione partnership request
-- Evento approvazione partnership
-- Evento rifiuto partnership  
-- Statistiche aggiornate in tempo reale
-
----
-
-## 🎯 Interazioni tramite Bottoni (FASE 5)
-
-I comandi partnership utilizzano bottoni Discord per semplificare l'interazione:
-
-### Partnership Request
-- Lo staff riceve una richiesta con bottoni di approvazione/rifiuto
-- Clicca il bottone "Approva" per accettare
-- Clicca il bottone "Rifiuta" con opzione motivo
-- Log automatico di ogni azione
-
-### Partnership Approve/Reject
-- Comandi intuitivi con bottoni di conferma
-- Ogni azione viene loggata su console e Discord
-- Feedback immediato all'utente
-
----
-
-## 🔧 Integrazione del Sistema di Errori
-
-Tutti gli errori sono tracciati nei due sistemi di logging:
-- **Console**: stack trace completo per debug
-- **Discord**: errore formattato per facilità di lettura
-- Classificazione: errori DB, errori permessi, errori generici
-
----
-
-**✨ Congratulazioni! Il tuo bot MinfoAI è pronto!** 🎉
+> **Note**: Questo è un progetto open-source. Sentiti libero di usarlo, modificarlo e condividerlo secondo i termini della licenza MIT.
