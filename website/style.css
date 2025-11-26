@@ -47,33 +47,6 @@ nav {
     padding: 1.5rem 5%;
     backdrop-filter: blur(15px);
     background: rgba(5, 5, 7, 0.7);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(to right, #fff, #c4b5fd);
-    -webkit-background-clip: text;
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-    color: white;
-    -webkit-text-fill-color: white;
-    vertical-align: middle;
-    margin-left: 0.5rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.links a {
-    color: var(--text-dim);
-    text-decoration: none;
-    margin: 0 1.5rem;
     font-weight: 500;
     transition: all 0.3s ease;
     position: relative;
