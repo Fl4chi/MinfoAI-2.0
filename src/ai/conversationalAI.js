@@ -1,29 +1,77 @@
-const axios = require('axios');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
 class ConversationalAI {
+    constructor() {
+        this.genAI = null;
+        this.model = null;
+        this.cache = new Map(); // Simple in-memory cache
+        this.CACHE_TTL = 3600 * 1000; // 1 hour
+        this.manualContent = '';
+        this.init();
+    }
+
+    init() {
+        // Load Manual
+        try {
+            const manualPath = path.join(__dirname, 'BOT_MANUAL.md');
+            if (fs.existsSync(manualPath)) {
+                this.manualContent = fs.readFileSync(manualPath, 'utf8');
+                console.log('[AI] Manuale caricato correttamente.');
+            } else {
+                console.warn('[AI] Manuale non trovato in:', manualPath);
+            }
+        } catch (err) {
+            console.error('[AI] Errore caricamento manuale:', err);
+        }
+
+        // Init Gemini
+        if (process.env.GEMINI_API_KEY) {
+            this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            console.log('[AI] Gemini AI initialized');
+        } else {
+            console.warn('[AI] GEMINI_API_KEY mancante in .env. L\'AI userà solo i fallback.');
+        }
+    }
+
     async askQuestion(question, context = {}) {
         try {
-            console.log(`\n[AI] Domanda: "${question.substring(0, 80)}"`);
+            const cleanQuestion = question.trim();
+            console.log(`\n[AI] Domanda: "${cleanQuestion.substring(0, 80)}"`);
 
-            // Prova Ollama
-            try {
-                console.log(`[AI] Tentativo Ollama...`);
-                const response = await this.askOllama(question);
-                console.log(`[AI] Ollama response:`, response ? `"${response.substring(0, 100)}..."` : 'NULL');
-
-                if (response && response.length > 10) {
-                    console.log(`[AI] ✅ Risposta Ollama OK (${response.length} chars)`);
-                    return response + '\n\n-# 💬 Usa `/ai-help` per altre domande!';
-                } else {
-                    console.log(`[AI] ⚠️ Risposta Ollama troppo corta o null`);
-                }
-            } catch (err) {
-                console.error(`[AI] ❌ Ollama fallito:`, err.message);
+            // 1. Check Cache
+            const cached = this.getFromCache(cleanQuestion);
+            if (cached) {
+                console.log('[AI] ⚡ Risposta da cache');
+                return cached;
             }
 
-            // Fallback semplice
+            // 2. Prova Gemini
+            if (this.model) {
+                try {
+                    console.log(`[AI] Tentativo Gemini...`);
+                    const response = await this.askGemini(cleanQuestion);
+                    console.log(`[AI] Gemini response:`, response ? `"${response.substring(0, 100)}..."` : 'NULL');
+
+                    if (response && response.length > 10) {
+                        console.log(`[AI] ✅ Risposta Gemini OK (${response.length} chars)`);
+                        const finalResponse = response + '\n\n-# 💬 Usa `/ai-help` per altre domande!';
+                        this.saveToCache(cleanQuestion, finalResponse);
+                        return finalResponse;
+                    }
+                } catch (err) {
+                    console.error(`[AI] ❌ Gemini fallito:`, err.message);
+                }
+            } else {
+                console.log('[AI] Gemini non configurato, salto...');
+            }
+
+            // 3. Fallback semplice
             console.log(`[AI] 🔄 Uso fallback`);
-            return this.getSimpleFallback(question);
+            return this.getSimpleFallback(cleanQuestion);
 
         } catch (error) {
             console.error(`[AI] Errore generale:`, error.message);
@@ -31,79 +79,66 @@ class ConversationalAI {
         }
     }
 
-    async askOllama(question) {
-        // Prova prima /api/generate (vecchio), poi /api/chat (nuovo)
+    async askGemini(question) {
         try {
-            const response = await axios.post('http://localhost:11434/api/generate', {
-                model: 'llama3.2:1b',
-                prompt: `Sei MinfoAI, assistente Discord per partnership. Comandi: /partner, /shop, /wallet, /stats. Rispondi in italiano, max 3 righe, tono amichevole.\n\nDomanda: ${question}\nRisposta:`,
-                stream: false,
-                options: {
-                    temperature: 0.7,
-                    num_predict: 150
-                }
-            }, { timeout: 12000 });
+            const prompt = `Sei MinfoAI, l'assistente ufficiale del bot Discord MinfoAI 2.0.
+            
+            USA QUESTE INFORMAZIONI PER RISPONDERE (MANUALE):
+            ${this.manualContent}
+            
+            CONTESTO UTENTE:
+            - Rispondi in italiano.
+            - Sii gentile, professionale e utile.
+            - Se la risposta è nel manuale, usala.
+            - Se non sai la risposta, suggerisci di contattare lo staff.
+            - Mantieni la risposta sotto le 4-5 righe se possibile.
+            
+            DOMANDA UTENTE: ${question}
+            
+            RISPOSTA:`;
 
-            if (response.data && response.data.response) {
-                return response.data.response.trim();
-            }
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text().trim();
         } catch (err) {
-            // Se /api/generate fallisce, prova /api/chat
-            if (err.response && err.response.status === 404) {
-                console.log(`[AI] /api/generate non disponibile, provo /api/chat...`);
-
-                const response = await axios.post('http://localhost:11434/api/chat', {
-                    model: 'llama3.2:1b',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'Sei MinfoAI, assistente Discord per partnership. Comandi: /partner, /shop, /wallet, /stats. Rispondi in italiano, max 3 righe, tono amichevole.'
-                        },
-                        {
-                            role: 'user',
-                            content: question
-                        }
-                    ],
-                    stream: false
-                }, { timeout: 12000 });
-
-                if (response.data && response.data.message && response.data.message.content) {
-                    return response.data.message.content.trim();
-                }
-            } else {
-                throw err;
-            }
+            throw err;
         }
+    }
 
+    getFromCache(key) {
+        if (this.cache.has(key)) {
+            const { value, timestamp } = this.cache.get(key);
+            if (Date.now() - timestamp < this.CACHE_TTL) {
+                return value;
+            }
+            this.cache.delete(key);
+        }
         return null;
+    }
+
+    saveToCache(key, value) {
+        // Limit cache size to 100 items to prevent memory leaks
+        if (this.cache.size > 100) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+        this.cache.set(key, { value, timestamp: Date.now() });
     }
 
     getSimpleFallback(question) {
         const q = question.toLowerCase();
 
-        if (q.includes('ciao') || q.includes('chi sei') || q.includes('come stai')) {
-            return 'Ciao! Sono MinfoAI, ti aiuto con le partnership del server. Usa `/partner request` per iniziare o chiedi pure!';
+        if (q.includes('ciao') || q.includes('chi sei')) {
+            return 'Ciao! Sono MinfoAI 2.0. Posso aiutarti con partnership, shop e comandi. Chiedimi pure!';
         }
-        if (q.includes('comando') || q.includes('comandi') || q.includes('help')) {
-            return 'Comandi: `/partner` (partnership), `/shop` (boost e tier), `/wallet` (coins), `/stats` (statistiche). Cosa ti serve?';
+        if (q.includes('tier') || q.includes('livelli')) {
+            return 'Abbiamo 4 Tier: Bronze (Gratis), Silver (1000 Coins), Gold (2500 Coins) e Platinum (5000 Coins). Ognuno ha vantaggi unici!';
         }
-        if (q.includes('shop') || q.includes('boost') || q.includes('tier')) {
-            return 'Nello `/shop` trovi boost (200-500 coins) e tier upgrade (Silver 1000, Gold 2500, Platinum 5000). I tier danno vantaggi permanenti!';
-        }
-        if (q.includes('coin') || q.includes('wallet') || q.includes('soldi')) {
-            return 'Usa `/wallet` per vedere i tuoi coins. Li guadagni con partnership approvate e li spendi nello `/shop`!';
-        }
-        if (q.includes('setup') || q.includes('configur')) {
-            return 'Usa `/setup` per configurare: canale partnership, ruolo staff, canale log. Fatto in 1 minuto!';
-        }
-        if (q.includes('partnership') || q.includes('partner')) {
-            return 'Usa `/partner request` per richiedere una partnership. Gli admin la approveranno e guadagnerai coins!';
-        }
-        if (q.includes('trust') || q.includes('score')) {
-            return 'Il Trust Score misura l\'affidabilità del server (0-100). Più partnership attive hai, più alto è. Vedi il tuo con `/stats`!';
+        if (q.includes('shop') || q.includes('compra')) {
+            return 'Usa `/shop` per vedere i potenziamenti disponibili. Puoi comprare Tier e Boost XP!';
         }
 
-        return 'Non ho capito bene. Prova a chiedere "come funziona lo shop" o "cosa sono i comandi"!';
+        return 'Non sono sicuro di aver capito. Prova a chiedere "quali sono i tier" o "come faccio partnership".';
     }
 }
 
