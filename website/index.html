@@ -4,14 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MinfoAI 2.0 - Next Gen Discord Bot</title>
+    <title>MinfoAI 2.0 - Partnership Discord Bot</title>
     <meta name="description"
-        content="Il bot Discord definitivo per gestire partnership, economia e community con l'intelligenza artificiale.">
+        content="Bot Discord con AI per gestire partnership, economia e community automaticamente.">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
@@ -19,26 +17,26 @@
 
     <nav>
         <div class="logo">
-            <i class="fas fa-robot" style="margin-right: 10px; color: var(--primary);"></i>
+            <img src="logo.png" alt="MinfoAI Logo" class="logo-img">
             MinfoAI <span class="version">2.0</span>
         </div>
         <div class="links">
             <a href="#features">Features</a>
             <a href="#partnership">Partnership</a>
             <a href="#tiers">Tiers</a>
-            <a href="https://discord.com" class="btn-primary">Aggiungi a Discord</a>
         </div>
+        <a href="https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID" class="btn-primary">Aggiungi a
+            Discord</a>
     </nav>
 
     <header class="hero">
         <div class="hero-content">
-            <div class="badge">✨ Powered by Google Gemini 2.0</div>
-            <h1>Il Futuro delle <br>Partnership Discord</h1>
-            <p>Automatizza, analizza e fai crescere la tua community con l'intelligenza artificiale avanzata. Genera il
-                tuo <strong>Business DNA</strong> con un click.</p>
+            <h1>Partnership Discord<br>di Nuova Generazione</h1>
+            <p>Automatizza le partnership con l'intelligenza artificiale. Analisi automatica, Trust Score e gestione
+                completa del tuo network Discord.</p>
             <div class="cta-group">
-                <a href="#partnership" class="btn-primary">Inizia Ora</a>
-                <a href="#features" class="btn-secondary">Scopri di più</a>
+                <a href="#partnership" class="btn-primary">Scopri Come Funziona</a>
+                <a href="#features" class="btn-secondary">Vedi Features</a>
             </div>
         </div>
         <div class="hero-visual">
@@ -46,111 +44,154 @@
                 <div class="chat-bubble user">/partner request</div>
                 <div class="chat-bubble bot">
                     <div class="typing-indicator"><span></span><span></span><span></span></div>
-                    Analisi server in corso... <br>
+                    🔍 Analisi in corso...<br>
                     ✅ <b>Partnership Approvata!</b><br>
-                    Tier: <span class="gold" style="color: #fbbf24; font-weight: bold;">GOLD</span> 🏆
+                    Trust Score: <span style="color: #10b981; font-weight: bold;">85/100</span><br>
+                    Tier: <span style="color: #fbbf24; font-weight: bold;">GOLD</span> 🏆
                 </div>
             </div>
         </div>
     </header>
 
     <section id="features" class="features">
-        <h2>Potenza AI al tuo servizio</h2>
+        <h2>Potenza AI al Tuo Servizio</h2>
+        <p class="section-subtitle">Gemini 2.0 analizza, automatizza e ottimizza ogni aspetto delle tue partnership</p>
         <div class="grid">
             <div class="feature-card">
                 <i class="fas fa-brain"></i>
                 <h3>Analisi Intelligente</h3>
-                <p>Gemini 2.0 analizza ogni richiesta di partnership, valutando la qualità del server e assegnando un
-                    Trust Score automatico.</p>
+                <p>L'AI valuta automaticamente ogni richiesta di partnership analizzando attività, membri e qualità del
+                    server per assegnare un Trust Score preciso.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-bolt"></i>
-                <h3>Automazione Totale</h3>
-                <p>Dalla richiesta alla pubblicazione: il bot gestisce tutto il flusso, notificando lo staff solo quando
-                    serve.</p>
+                <h3>Automazione Completa</h3>
+                <p>Dal momento della richiesta alla pubblicazione finale: il bot gestisce tutto il workflow notificando
+                    lo staff solo quando necessario.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-chart-line"></i>
                 <h3>Business DNA</h3>
-                <p>Ottieni report dettagliati sulla crescita e l'andamento delle tue partnership per ottimizzare la
-                    strategia.</p>
+                <p>Report dettagliati su crescita, engagement e ROI delle partnership per prendere decisioni
+                    data-driven.</p>
             </div>
         </div>
     </section>
 
-    <section id="partnership" class="features" style="background: rgba(0,0,0,0.2);">
+    <section id="partnership" class="features dark-section">
         <h2>Sistema Partnership Avanzato</h2>
-        <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem auto; color: var(--text-dim);">Il nostro
-            sistema proprietario valuta le community in base a metriche reali.</p>
+        <p class="section-subtitle">Valutazione automatica basata su metriche reali e intelligenza artificiale</p>
         <div class="grid">
             <div class="feature-card">
                 <i class="fas fa-shield-alt"></i>
-                <h3>Trust Score</h3>
-                <p>Un punteggio da 0 a 100 che indica l'affidabilità di un partner potenziale.</p>
+                <h3>Trust Score (0-100)</h3>
+                <p>Algoritmo proprietario che valuta affidabilità, attività storica, qualità dei membri e engagement del
+                    server partner.</p>
             </div>
             <div class="feature-card">
-                <i class="fas fa-handshake"></i>
-                <h3>Gestione Tier</h3>
-                <p>Assegna automaticamente vantaggi ai partner in base al loro livello (Bronze, Silver, Gold, Platinum).
-                </p>
+                <i class="fas fa-users"></i>
+                <h3>Gestione Tier Automatica</h3>
+                <p>Assegnazione automatica di vantaggi e privilegi in base al livello raggiunto: Bronze, Silver, Gold o
+                    Platinum.</p>
             </div>
             <div class="feature-card">
                 <i class="fas fa-globe"></i>
-                <h3>Global Network</h3>
-                <p>Connettiti con migliaia di altri server nel network MinfoAI.</p>
+                <h3>Network Globale</h3>
+                <p>Accesso a migliaia di server verificati nel network MinfoAI per espandere la tua community
+                    rapidamente.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-robot"></i>
+                <h3>AI Assistant 24/7</h3>
+                <p>Risposte immediate alle domande degli utenti su partnership, tier e funzionalità grazie a Gemini 2.0.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-coins"></i>
+                <h3>Economia Integrata</h3>
+                <p>Sistema di coins per premiare partnership attive e sbloccare upgrade premium per il tuo server.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-bell"></i>
+                <h3>Notifiche Smart</h3>
+                <p>Alert personalizzati per nuove richieste, approvazioni e milestone raggiunte dalle tue partnership.
+                </p>
             </div>
         </div>
     </section>
 
     <section id="tiers" class="tiers-section">
         <h2>Sistema di Tier</h2>
+        <p class="section-subtitle">Sblocca vantaggi esclusivi salendo di livello</p>
         <div class="tier-grid">
-            <div class="tier-card bronze">
-                <h3>Bronze</h3>
+            <div class="tier-card">
+                <h3>🥉 Bronze</h3>
                 <p class="price">Gratis</p>
                 <ul>
-                    <li><i class="fas fa-check"></i> Funzioni base</li>
+                    <li><i class="fas fa-check"></i> Comandi base</li>
                     <li><i class="fas fa-check"></i> Partnership manuali</li>
+                    <li><i class="fas fa-check"></i> Supporto community</li>
                 </ul>
             </div>
-            <div class="tier-card silver">
-                <h3>Silver</h3>
-                <p class="price">1000 Coins <span>/ una tantum</span></p>
+            <div class="tier-card">
+                <h3>🥈 Silver</h3>
+                <p class="price">1000 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Bronze</li>
                     <li><i class="fas fa-check"></i> Auto-reply AI</li>
-                    <li><i class="fas fa-check"></i> Boost XP (+10%)</li>
+                    <li><i class="fas fa-check"></i> Boost XP +10%</li>
+                    <li><i class="fas fa-check"></i> Ruolo dedicato</li>
                 </ul>
             </div>
-            <div class="tier-card gold popular">
-                <div class="badge"
-                    style="position: absolute; top: 20px; right: 20px; background: var(--primary); color: white; border: none;">
-                    BEST</div>
-                <h3>Gold</h3>
-                <p class="price">2500 Coins <span>/ una tantum</span></p>
+            <div class="tier-card popular">
+                <div class="popular-badge">PIÙ POPOLARE</div>
+                <h3>🥇 Gold</h3>
+                <p class="price">2500 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Silver</li>
-                    <li><i class="fas fa-check"></i> Partnership Prioritarie</li>
+                    <li><i class="fas fa-check"></i> Partnership prioritarie</li>
                     <li><i class="fas fa-check"></i> Canali dedicati</li>
-                    <li><i class="fas fa-check"></i> Boost XP (+25%)</li>
+                    <li><i class="fas fa-check"></i> Boost XP +25%</li>
+                    <li><i class="fas fa-check"></i> Analytics avanzati</li>
                 </ul>
             </div>
-            <div class="tier-card platinum">
-                <h3>Platinum</h3>
-                <p class="price">5000 Coins <span>/ una tantum</span></p>
+            <div class="tier-card">
+                <h3>💎 Platinum</h3>
+                <p class="price">5000 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Gold</li>
-                    <li><i class="fas fa-check"></i> AI Personalizzata</li>
-                    <li><i class="fas fa-check"></i> Supporto 24/7</li>
-                    <li><i class="fas fa-check"></i> Boost XP (+50%)</li>
+                    <li><i class="fas fa-check"></i> AI personalizzata</li>
+                    <li><i class="fas fa-check"></i> Supporto prioritario 24/7</li>
+                    <li><i class="fas fa-check"></i> Boost XP +50%</li>
+                    <li><i class="fas fa-check"></i> Partnership in evidenza</li>
+                    <li><i class="fas fa-check"></i> Business DNA completo</li>
                 </ul>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 MinfoAI Project. All rights reserved.</p>
-        <p class="small">Designed for the future.</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>MinfoAI 2.0</h4>
+                <p>Il futuro delle partnership Discord</p>
+            </div>
+            <div class="footer-section">
+                <h4>Links</h4>
+                <a href="#features">Features</a>
+                <a href="#partnership">Partnership</a>
+                <a href="#tiers">Tiers</a>
+            </div>
+            <div class="footer-section">
+                <h4>Supporto</h4>
+                <a href="https://discord.gg/your-server">Discord Server</a>
+                <a href="https://github.com/Fl4chi/MinfoAI-2.0">GitHub</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 MinfoAI Project. All rights reserved.</p>
+            <p class="small">Made with ❤️ by Fl4chi</p>
+        </div>
     </footer>
 
     <script src="script.js"></script>
