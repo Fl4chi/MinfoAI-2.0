@@ -106,6 +106,54 @@ class ConversationalAI {
         }
     }
 
+    async analyzeUserProfile(userProfile) {
+        try {
+            const prompt = `Analizza questo profilo utente per una partnership Discord.
+            
+            DATI UTENTE:
+            - Username: ${userProfile.username}
+            - Messaggi: ${userProfile.messages}
+            - Data ingresso: ${userProfile.joinDate}
+            - Ruoli: ${userProfile.roles.join(', ')}
+            
+            CRITERI:
+            - Affidabilità (0-100)
+            - Attività
+            - Idoneità per partnership
+            
+            Rispondi con un JSON valido:
+            {
+                "trustScore": numero,
+                "summary": "breve descrizione",
+                "recommendation": "APPROVE" o "DENY" o "MANUAL_REVIEW"
+            }`;
+
+            if (this.model) {
+                const result = await this.model.generateContent(prompt);
+                const response = await result.response;
+                const text = response.text();
+
+                // Pulisci il markdown JSON se presente
+                const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                return JSON.parse(jsonStr);
+            }
+
+            return {
+                trustScore: 50,
+                summary: "Analisi AI non disponibile (Fallback)",
+                recommendation: "MANUAL_REVIEW"
+            };
+
+        } catch (err) {
+            console.error('[AI] Errore analisi profilo:', err.message);
+            return {
+                trustScore: 0,
+                summary: "Errore durante l'analisi AI",
+                recommendation: "MANUAL_REVIEW"
+            };
+        }
+    }
+
     getFromCache(key) {
         if (this.cache.has(key)) {
             const { value, timestamp } = this.cache.get(key);

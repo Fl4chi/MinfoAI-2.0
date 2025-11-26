@@ -2,7 +2,7 @@ const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
-const ollamaAI = require('../../ai/ollamaAI');
+const conversationalAI = require('../../ai/conversationalAI');
 const userProfiler = require('../../ai/userProfiler');
 const { v4: uuidv4 } = require('uuid');
 const { sendPartnershipNotification } = require('../../handlers/notificationHandler');
@@ -72,7 +72,7 @@ async function handleRequest(interaction) {
 
     // AI Analysis
     const userProfile = await userProfiler.buildUserProfile(interaction.user, interaction.guild);
-    const aiAnalysis = await ollamaAI.analyzeUserProfile(userProfile);
+    const aiAnalysis = await conversationalAI.analyzeUserProfile(userProfile);
     const credScore = calculateCredibility(userProfile);
 
     // Create Partnership

@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('disc
 const Partnership = require('../../database/partnershipSchema');
 const CustomEmbedBuilder = require('../../utils/embedBuilder');
 const errorLogger = require('../../utils/errorLogger');
-const ollamaAI = require('../../ai/ollamaAI');
+const conversationalAI = require('../../ai/conversationalAI');
 const userProfiler = require('../../ai/userProfiler');
 const ButtonHandler = require('../../utils/buttonHandler');
 
@@ -61,7 +61,7 @@ async function handleApprove(interaction) {
         const member = await interaction.guild.members.fetch(partnership.primaryGuild.userId).catch(() => null);
         if (member) {
             const userProfile = await userProfiler.buildUserProfile(member, interaction.guild);
-            aiAnalysis = await ollamaAI.analyzeUserProfile(userProfile);
+            aiAnalysis = await conversationalAI.analyzeUserProfile(userProfile);
         }
     } catch (e) { /* Ignore */ }
 
