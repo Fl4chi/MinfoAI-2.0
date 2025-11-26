@@ -30,7 +30,8 @@ class ConversationalAI {
         // Init Gemini
         if (process.env.GEMINI_API_KEY) {
             this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            // Using gemini-2.0-flash as discovered via diagnosis
+            this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
             console.log('[AI] Gemini AI initialized');
         } else {
             console.warn('[AI] GEMINI_API_KEY mancante in .env. L\'AI userà solo i fallback.');
