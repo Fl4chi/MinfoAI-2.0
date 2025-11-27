@@ -39,71 +39,74 @@ Il sistema di progressione si basa su 4 livelli (Tier). Ogni livello sblocca van
 
 ---
 
-## 💰 Economia e Shop
-La valuta del server sono i **MinfoCoins**.
+## 💰 Economia Avanzata & Rewards
+Il sistema economico di MinfoAI 2.0 è progettato per premiare l'attività e la qualità.
 
-### 💎 Come Guadagnare Coins
+### 💎 Come Guadagnare Coins (Rewards)
 
-#### Guadagni Base
-- **Daily Login Bonus:** +10 coins (ogni giorno)
-- **Partnership Request Inviata:** +20 coins (per richiesta)
-- **Messaggio Attivo:** +1 coin (ogni 100 messaggi)
+| Azione | Reward | Note |
+|--------|--------|------|
+| **Partnership Completata** | `+100 coins` | Per ogni partnership andata a buon fine |
+| **Review Positiva** | `+50 coins` | Ricevuta da un altro server (5 stelle) |
+| **Streak 7 Giorni** | `+75 coins` | Attività consecutiva per una settimana |
+| **Referral Nuovo Utente** | `+50 coins` | Invita un amico che usa il bot |
+| **Milestone Raggiunta** | `+200 coins` | Obiettivi speciali (es. 100 partnership) |
+| **Partnership Gold** | `+500 coins` | Bonus una tantum raggiungendo il Tier Gold |
+| **Partnership Platinum** | `+1000 coins` | Bonus una tantum raggiungendo il Tier Platinum |
+| **Daily Login** | `+10 coins` | Comando `/daily` ogni 24h |
+| **Eventi** | `+150 coins` | Partecipazione a eventi community |
 
-#### Guadagni Partnership
-- **Partnership Completata:** +100 coins
-- **Review Positiva Ricevuta:** +50 coins
-- **Partnership Gold Tier:** +500 coins (bonus una tantum)
-- **Partnership Platinum Tier:** +1000 coins (bonus una tantum)
+### 📜 Daily Quests (Missioni Giornaliere)
+Nuove missioni ogni 24 ore per guadagni extra.
 
-#### Guadagni Social
-- **Referral Nuovo Utente:** +50 coins (per invito)
-- **Partecipazione Eventi:** +150 coins (per evento)
-- **Streak 7 Giorni Attività:** +75 coins (settimanale)
+- **"Invia 1 partnership request"** → `+20 coins`
+- **"Approva 3 partnership (staff)"** → `+50 coins`
+- **"Invita 1 persona con referral"** → `+30 coins`
+- **"Raggiungi 100 messaggi"** → `+40 coins`
+- **"Partnership attiva per 30 giorni"** → `+200 coins`
 
-#### Guadagni Milestone
-- **Milestone Raggiunta:** +200 coins (varia per tipo)
-- **Achievement Sbloccato:** +100-500 coins (per achievement)
+---
 
-### 📋 Daily Quests System
+## 🛍️ Premium Shop & Perks
+Spendi i tuoi coins per potenziare il tuo server e la tua visibilità.
 
-Completa le quest giornaliere per guadagnare coins extra! Le quest si resettano ogni 24h.
+### 🚀 Visibilità & Promozione
+- **Super Boost** (`1000 coins`): Partnership in evidenza per **14 giorni**.
+- **Featured Badge** (`750 coins`): Badge "In evidenza" permanente sul profilo server.
+- **Top Placement** (`1500 coins`): **Prima posizione** in `/partner list` per 7 giorni.
+- **Highlight Color** (`500 coins`): Colore personalizzato per l'embed della partnership.
 
-| Quest | Reward | Difficoltà |
-|-------|--------|------------|
-| Invia 1 partnership request | +20 coins | ⭐ Facile |
-| Approva 3 partnership (staff) | +50 coins | ⭐⭐ Media |
-| Invita 1 persona con referral | +30 coins | ⭐ Facile |
-| Raggiungi 100 messaggi | +40 coins | ⭐⭐ Media |
-| Partnership attiva 30 giorni | +200 coins | ⭐⭐⭐ Difficile |
+### ⚡ Booster Temporanei
+- **2x Visibility** (`200 coins/day`): Doppia frequenza di apparizione per 24h.
+- **Weekend Boost** (`500 coins`): Boost visibilità durante tutto il weekend.
+- **Flash Promotion** (`300 coins`): Promozione massiva per 4 ore (ottimo per eventi).
+- **Holiday Special** (`800 coins`): Boost speciale durante le festività.
 
-**Streak Bonus:** Completa tutte le quest per 7 giorni consecutivi → +300 coins bonus!
+### 🎮 Gamification & Utility
+- **Achievement Badges** (Vari prezzi): Badge collezionabili per il profilo.
+- **Leaderboard Boost** (`400 coins`): +10 posizioni fittizie in classifica (estetico).
+- **Streak Protector** (`300 coins`): Proteggi la tua streak se salti un giorno.
+- **XP Multiplier** (`500 coins/week`): **2x XP** guadagnato per 7 giorni.
 
-### 🛍️ Premium Shop
+---
 
-#### 🎁 Visibilità & Promozione
-- **Super Boost** (1000 coins) - Partnership in evidenza per 14 giorni
-- **Featured Badge** (750 coins) - Badge "⭐ Featured" permanente sul profilo
-- **Top Placement** (1500 coins) - Prima posizione in `/partner list` per 7 giorni
-- **Highlight Color** (500 coins) - Colore personalizzato per embed partnership
+## 📈 Credibility Score (Trust System)
+Ogni utente e server ha un punteggio di affidabilità da **0 a 100**.
 
-#### ⚡ Booster Temporanei
-- **2x Visibility** (200 coins/giorno) - Doppia visibilità per 24h
-- **Weekend Boost** (500 coins) - Boost durante tutto il weekend
-- **Flash Promotion** (300 coins) - Promozione massiva per 4 ore
-- **Holiday Special** (800 coins) - Boost durante festività
+**Calcolo del Punteggio:**
+- **30%** Età Account Discord
+- **20%** Attività Messaggi
+- **15%** Ruoli nel Server
+- **15%** Partnership Passate
+- **10%** Wallet Balance
+- **10%** Reputazione
 
-#### 🎮 Gamification
-- **Achievement Badges** (100-500 coins) - Badge per milestone raggiunte
-- **Leaderboard Boost** (400 coins) - +10 posizioni in classifica per 7 giorni
-- **Streak Protector** (300 coins) - Proteggi la tua streak partnership (1 uso)
-- **XP Multiplier** (500 coins/settimana) - 2x XP guadagnato per 7 giorni
+**Livelli di Affidabilità:**
+- 🟢 **71-100 (Alta):** Trusted. Accesso a tutte le funzioni e approvazione rapida.
+- 🟡 **41-70 (Media):** Standard. Funzionalità normali.
+- 🔴 **0-40 (Bassa):** Richiede attenzione. Verifiche manuali aggiuntive.
 
-### Comandi Economia:
-- `/wallet`: Visualizza il saldo attuale e statistiche guadagni.
-- `/shop`: Apre il negozio per acquistare Tier, Boost e Perks.
-- `/pay [utente] [importo]`: Invia coins a un altro utente.
-- `/daily`: Riscuoti il bonus giornaliero e visualizza le quest.
-- `/quests`: Visualizza le quest attive e i progressi.
+*Il sistema AI analizza automaticamente ogni richiesta per prevenire frodi.*
 
 ---
 

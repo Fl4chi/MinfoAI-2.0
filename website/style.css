@@ -60,6 +60,298 @@ nav {
     background: linear-gradient(to right, #fff, #c4b5fd);
     -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+    background: transparent;
+}
+
+.version {
+    font-size: 0.7rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    color: white;
+    -webkit-text-fill-color: white;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    margin: 0 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.links a:hover {
+    color: var(--text);
+}
+
+.links a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background: var(--primary);
+    transition: width 0.3s;
+}
+
+.links a:hover::after {
+    width: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+}
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8rem 5%;
+    min-height: 90vh;
+    position: relative;
+}
+
+.hero-content {
+    max-width: 650px;
+    z-index: 10;
+}
+
+h1 {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(to bottom right, #ffffff 30%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+}
+
+p {
+    color: var(--text-dim);
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+    font-weight: 300;
+}
+
+.cta-group {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hero-visual {
+    position: relative;
+    perspective: 1000px;
+}
+
+.hero-banner {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.6));
+    animation: cometFloat 6s ease-in-out infinite;
+    background: transparent;
+}
+
+@keyframes cometFloat {
+
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+        filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.6));
+    }
+
+    25% {
+        transform: translateY(-15px) translateX(10px);
+        filter: drop-shadow(0 0 50px rgba(99, 102, 241, 0.8));
+    }
+
+    50% {
+        transform: translateY(-25px) translateX(-5px);
+        filter: drop-shadow(0 0 60px rgba(168, 85, 247, 0.9));
+    }
+
+    75% {
+        transform: translateY(-10px) translateX(5px);
+        filter: drop-shadow(0 0 45px rgba(99, 102, 241, 0.7));
+    }
+}
+
+.features {
+    padding: 8rem 5%;
+    text-align: center;
+    position: relative;
+}
+
+.features h2,
+.tiers-section h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: -1rem auto 3rem auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 4rem;
+}
+
+.feature-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 3rem 2rem;
+    border-radius: 24px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    background: var(--card-hover);
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.feature-card i {
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.dark-section {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
+    padding: 6rem 5%;
+}
+
+.tiers-section {
+    padding: 8rem 5%;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+}
+
+.tier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+    margin-top: 4rem;
+}
+
+.tier-card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 3rem 2rem;
+    padding-top: 3.5rem;
+    border-radius: 24px;
+    text-align: center;
+    position: relative;
+    overflow: visible;
+    transition: transform 0.3s;
+}
+
+.tier-card:hover {
+    transform: translateY(-10px);
+}
+
+.tier-card.popular {
+    background: linear-gradient(145deg, rgba(99, 102, 241, 0.1), rgba(5, 5, 7, 0.8));
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.tier-card.popular:hover {
+    transform: scale(1.05) translateY(-10px);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.tier-card .price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 1.5rem 0;
     color: white;
     display: flex;
     align-items: center;
