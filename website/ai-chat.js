@@ -86,9 +86,7 @@ class AIChat {
 
     async init() {
         console.log('%c[MinfoAI] AI Chat Assistant Initialized', 'color: #a855f7; font-weight: bold');
-        // In production, fetch API key from backend endpoint
-        // For now, we'll use a placeholder
-        this.apiKey = 'YOUR_GEMINI_API_KEY'; // Replace with actual key from .env
+        console.log('%c[MinfoAI] Using backend API endpoint', 'color: #94a3b8');
     }
 
     async sendMessage(message) {
@@ -106,84 +104,34 @@ class AIChat {
             this.addMessage(response, 'bot');
         } catch (error) {
             this.hideTyping();
-            this.addMessage('Scusa, ho avuto un problema. Riprova!', 'bot');
-            console.error('AI Chat Error:', error);
+
+            const p = document.createElement('p');
+            p.textContent = text;
+            messageDiv.appendChild(p);
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            this.messages.push({ text, sender, timestamp: new Date() });
+        }
+
+        showTyping() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot-message typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<p><span></span><span></span><span></span></p>';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
         }
     }
 
-    async callGeminiAPI(message) {
-        // Note: In production, this should go through your backend to keep API key secure
-        const API_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-
-        const prompt = `Sei l'assistente AI di MinfoAI, un bot Discord per gestire partnership.
-        
-CONTESTO:
-- MinfoAI offre sistema di partnership automatizzato
-- Credibility Score da 0-100
-- Economy con MinfoCoins
-- Daily Quests e Premium Shop
-- Tier: Bronze, Silver, Gold, Platinum
-
-Rispondi in italiano, sii conciso (max 3-4 righe), professionale e utile.
-
-DOMANDA: ${message}
-
-RISPOSTA:`;
-
-        const response = await fetch(`${API_ENDPOINT}?key=${this.apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.candidates[0].content.parts[0].text;
-    }
-
-    addMessage(text, sender) {
-        const messagesContainer = document.getElementById('chatMessages');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${sender}-message`;
-
-        const p = document.createElement('p');
-        p.textContent = text;
-        messageDiv.appendChild(p);
-
-        messagesContainer.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        this.messages.push({ text, sender, timestamp: new Date() });
-    }
-
-    showTyping() {
-        const messagesContainer = document.getElementById('chatMessages');
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chat-message bot-message typing-indicator';
-        typingDiv.id = 'typingIndicator';
-        typingDiv.innerHTML = '<p><span></span><span></span><span></span></p>';
-        messagesContainer.appendChild(typingDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    hideTyping() {
-        const typing = document.getElementById('typingIndicator');
-        if (typing) typing.remove();
-    }
-}
-
-const aiChat = new AIChat();
+    const aiChat = new AIChat();
 
 // ===== GLOBAL FUNCTIONS =====
 function toggleChat() {
