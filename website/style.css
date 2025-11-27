@@ -232,38 +232,6 @@ p {
 
 .features {
     padding: 8rem 5%;
-    text-align: center;
-    position: relative;
-}
-
-.features h2,
-.tiers-section h2 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.section-subtitle {
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 1.1rem;
-    max-width: 700px;
-    margin: -1rem auto 3rem auto;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2.5rem;
-    margin-top: 4rem;
-}
-
-.feature-card {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
     padding: 3rem 2rem;
     border-radius: 24px;
     transition: all 0.4s ease;
