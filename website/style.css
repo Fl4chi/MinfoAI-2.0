@@ -47,37 +47,6 @@ nav {
     padding: 1.5rem 5%;
     backdrop-filter: blur(15px);
     background: rgba(5, 5, 7, 0.7);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(to right, #fff, #c4b5fd);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.logo-icon {
-    font-size: 1.8rem;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
-}
-
-.links a {
-    color: var(--text-dim);
-    text-decoration: none;
     margin: 0 1.5rem;
     font-weight: 500;
     transition: all 0.3s ease;
