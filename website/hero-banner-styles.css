@@ -1,20 +1,67 @@
+/* Hero Banner Styles with Particle Animation */
 .hero-banner-img {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     height: auto;
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
-    animation: float 6s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(138, 85, 247, 0.8));
+    animation: floatAndGlow 8s ease-in-out infinite;
+    position: relative;
 }
 
-@keyframes float {
+@keyframes floatAndGlow {
 
     0%,
     100% {
-        transform: translateY(0px);
+        transform: translateY(0px) scale(1);
+        filter: drop-shadow(0 0 40px rgba(138, 85, 247, 0.8));
+    }
+
+    25% {
+        transform: translateY(-15px) scale(1.02);
+        filter: drop-shadow(0 0 60px rgba(168, 85, 247, 1));
     }
 
     50% {
-        transform: translateY(-20px);
+        transform: translateY(-25px) scale(1.03);
+        filter: drop-shadow(0 0 80px rgba(138, 85, 247, 0.9));
+    }
+
+    75% {
+        transform: translateY(-15px) scale(1.02);
+        filter: drop-shadow(0 0 60px rgba(168, 85, 247, 1));
+    }
+}
+
+/* Particle effect overlay */
+.hero-visual {
+    position: relative;
+}
+
+.hero-visual::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(138, 85, 247, 0.3) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.1);
     }
 }
