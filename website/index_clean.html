@@ -8,7 +8,6 @@
     <meta name="description"
         content="Bot Discord con AI per gestire partnership, economia e community automaticamente.">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="chat-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -18,8 +17,8 @@
 
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="MinfoAI" class="logo-img">
-            <span class="logo-text">MinfoAI</span>
+            <i class="fas fa-robot logo-icon"></i>
+            MinfoAI
         </div>
         <div class="links">
             <a href="#features">Features</a>
@@ -59,7 +58,7 @@
             <div class="feature-card">
                 <i class="fas fa-brain"></i>
                 <h3>Analisi Intelligente</h3>
-                <p>L'AI valuta automaticamente ogni richiesta di partnership analizzando attività, membri e qualità del
+                <p>L'AI valuta automaticamente ogni richiesta di partnership analizzando attivit├á, membri e qualit├á del
                     server per assegnare un Trust Score preciso.</p>
             </div>
             <div class="feature-card">
@@ -78,8 +77,9 @@
     </section>
 
     <section id="credibility" class="features dark-section">
-        <h2>📈 Credibility Score</h2>
-        <p class="section-subtitle">Il nostro algoritmo proprietario valuta l'affidabilità da 0 a 100</p>
+        <h2>­ƒôê Credibility Score</h2>
+        <p class="section-subtitle">Il nostro algoritmo proprietario valuta l'affidabilit├á da 0 a 100</p>
+
         <div class="credibility-display">
             <div class="score-circle">
                 <svg viewBox="0 0 36 36" class="circular-chart green">
@@ -93,13 +93,13 @@
             </div>
             <div class="score-details">
                 <div class="score-item">
-                    <span>Età Account (30%)</span>
+                    <span>Et├á Account (30%)</span>
                     <div class="bar">
                         <div class="fill" style="width: 90%"></div>
                     </div>
                 </div>
                 <div class="score-item">
-                    <span>Attività (20%)</span>
+                    <span>Attivit├á (20%)</span>
                     <div class="bar">
                         <div class="fill" style="width: 75%"></div>
                     </div>
@@ -111,16 +111,16 @@
                     </div>
                 </div>
                 <div class="score-legend">
-                    <span class="badge green">🟢 71-100 Trusted</span>
-                    <span class="badge yellow">🟡 41-70 Standard</span>
-                    <span class="badge red">🔴 0-40 Risk</span>
+                    <span class="badge green">­ƒƒó 71-100 Trusted</span>
+                    <span class="badge yellow">­ƒƒí 41-70 Standard</span>
+                    <span class="badge red">­ƒö┤ 0-40 Risk</span>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="economy" class="features">
-        <h2>💎 Economy & Rewards</h2>
+        <h2>­ƒÆÄ Economy & Rewards</h2>
         <p class="section-subtitle">Guadagna MinfoCoins e sblocca vantaggi esclusivi</p>
         <div class="grid">
             <div class="feature-card">
@@ -148,7 +148,7 @@
         <p class="section-subtitle">Sblocca vantaggi esclusivi salendo di livello</p>
         <div class="tier-grid">
             <div class="tier-card">
-                <h3>🥉 Bronze</h3>
+                <h3>­ƒÑë Bronze</h3>
                 <p class="price">Gratis</p>
                 <ul>
                     <li><i class="fas fa-check"></i> Comandi base</li>
@@ -157,7 +157,7 @@
                 </ul>
             </div>
             <div class="tier-card">
-                <h3>🥈 Silver</h3>
+                <h3>­ƒÑê Silver</h3>
                 <p class="price">1000 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Bronze</li>
@@ -167,8 +167,8 @@
                 </ul>
             </div>
             <div class="tier-card popular">
-                <div class="popular-badge">PIÙ POPOLARE</div>
-                <h3>🥇 Gold</h3>
+                <div class="popular-badge">PI├Ö POPOLARE</div>
+                <h3>­ƒÑç Gold</h3>
                 <p class="price">2500 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Silver</li>
@@ -179,7 +179,7 @@
                 </ul>
             </div>
             <div class="tier-card">
-                <h3>💎 Platinum</h3>
+                <h3>­ƒÆÄ Platinum</h3>
                 <p class="price">5000 <span>Coins</span></p>
                 <ul>
                     <li><i class="fas fa-check"></i> Tutto Gold</li>
@@ -192,29 +192,6 @@
             </div>
         </div>
     </section>
-
-    <!-- AI Chat Widget -->
-    <div id="ai-chat-widget" class="ai-chat-widget">
-        <div class="chat-header">
-            <i class="fas fa-robot"></i>
-            <span>MinfoAI Assistant</span>
-            <button class="chat-close" onclick="toggleChat()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-message bot-message">
-                <p>👋 Ciao! Sono l'assistente AI di MinfoAI. Come posso aiutarti?</p>
-            </div>
-        </div>
-        <div class="chat-input-container">
-            <input type="text" id="chatInput" placeholder="Scrivi la tua domanda..."
-                onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-
-    <button class="chat-fab" onclick="toggleChat()">
-        <i class="fas fa-comments"></i>
-    </button>
 
     <footer>
         <div class="footer-content">
@@ -236,12 +213,11 @@
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 MinfoAI Project. All rights reserved.</p>
-            <p class="small">Made with ❤️ by Fl4chi</p>
+            <p class="small">Made with ÔØñ´©Å by Fl4chi</p>
         </div>
     </footer>
 
     <script src="script.js"></script>
-    <script src="ai-chat.js"></script>
 </body>
 
 </html>
