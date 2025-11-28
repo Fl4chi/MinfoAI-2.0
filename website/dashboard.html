@@ -147,48 +147,20 @@
         <div class="card" style="grid-column: 1 / -1;">
             <h3><i class="fas fa-terminal"></i> Live Logs</h3>
             <div class="log-console" id="logConsole">
-                <div class="log-entry"><span class="log-time">12:00:00</span><span
-                        class="log-type INFO">INFO</span>Dashboard connected.</div>
-            </div>
-        </div>
-    </div>
+                entry.innerHTML = `<span class="log-time">${time}</span><span
+                    class="log-type ${type}">${type}</span>${msg}`;
+                console.insertBefore(entry, console.firstChild);
+                }
 
-    <script>
-        // Fetch User Data
-        fetch('/api/user')
-            .then(res => {
-                if (res.status === 401) window.location.href = '/auth/discord';
-                return res.json();
-            })
-            .then(user => {
-                document.getElementById('userProfile').innerHTML = `
-                    <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" class="user-avatar">
-                    <div>
-                        <h2>Benvenuto, ${user.username}</h2>
-                        <p style="color: #888;">ID: ${user.id}</p>
-                    </div>
-                `;
-            });
-
-        // Simulate Live Logs (In production, use WebSocket)
-        function addLog(type, msg) {
-            const console = document.getElementById('logConsole');
-            const time = new Date().toLocaleTimeString();
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `<span class="log-time">${time}</span><span class="log-type ${type}">${type}</span>${msg}`;
-            console.insertBefore(entry, console.firstChild);
-        }
-
-        setInterval(() => {
-            // Mock data for demo
-            const types = ['INFO', 'INFO', 'WARN'];
-            const msgs = ['Checking partnership queue...', 'Heartbeat received', 'High latency detected'];
-            if (Math.random() > 0.7) {
+                setInterval(() => {
+                // Mock data for demo
+                const types = ['INFO', 'INFO', 'WARN'];
+                const msgs = ['Checking partnership queue...', 'Heartbeat received', 'High latency detected'];
+                if (Math.random() > 0.7) {
                 addLog(types[Math.floor(Math.random() * 3)], msgs[Math.floor(Math.random() * 3)]);
-            }
-        }, 5000);
-    </script>
+                }
+                }, 5000);
+                </script>
 </body>
 
 </html>

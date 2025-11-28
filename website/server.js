@@ -30,14 +30,23 @@ passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
 // Discord Strategy
-passport.use(new DiscordStrategy({
-    clientID: process.env.DISCORD_CLIENT_ID,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET,
-    callbackURL: `http://localhost:${port}/auth/discord/callback`,
-    scope: ['identify', 'guilds']
-}, (accessToken, refreshToken, profile, done) => {
-    process.nextTick(() => done(null, profile));
-}));
+const clientID = process.env.DISCORD_CLIENT_ID;
+const clientSecret = process.env.DISCORD_CLIENT_SECRET;
+
+const isConfigured = clientID && clientSecret && clientID !== 'your_discord_client_id_here' && !clientID.includes('YOUR_CLIENT_ID');
+
+if (isConfigured) {
+    passport.use(new DiscordStrategy({
+        clientID: clientID,
+        clientSecret: clientSecret,
+        callbackURL: `http://localhost:${port}/auth/discord/callback`,
+        scope: ['identify', 'guilds']
+    }, (accessToken, refreshToken, profile, done) => {
+        process.nextTick(() => done(null, profile));
+    }));
+} else {
+    console.warn('⚠️ Discord Login DISABLED: Missing or invalid DISCORD_CLIENT_ID/SECRET in .env');
+}
 
 // --- AI Chat Route ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -73,6 +82,10 @@ app.get('/logout', (req, res) => {
 });
 
 // --- Dashboard API ---
+app.get('/api/auth-status', (req, res) => {
+    res.json({ enabled: isConfigured });
+});
+
 app.get('/api/user', (req, res) => {
     if (req.isAuthenticated()) {
         res.json(req.user);

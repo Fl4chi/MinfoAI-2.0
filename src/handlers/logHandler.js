@@ -56,6 +56,66 @@ class LogHandler {
                     .setFooter({ text: `ID: ${data.member.id}` })
                     .setTimestamp();
                 break;
+
+            case 'MEMBER_BAN':
+                embed = new EmbedBuilder()
+                    .setColor('#8b0000') // Dark Red
+                    .setAuthor({ name: 'Member Banned', iconURL: data.user.displayAvatarURL() })
+                    .setDescription(`**${data.user.tag}** was banned from the server.`)
+                    .addFields({ name: 'Reason', value: data.reason || 'No reason provided' })
+                    .setFooter({ text: `ID: ${data.user.id}` })
+                    .setTimestamp();
+                break;
+
+            case 'MEMBER_UNBAN':
+                embed = new EmbedBuilder()
+                    .setColor('#00ff00') // Green
+                    .setAuthor({ name: 'Member Unbanned', iconURL: data.user.displayAvatarURL() })
+                    .setDescription(`**${data.user.tag}** was unbanned.`)
+                    .setFooter({ text: `ID: ${data.user.id}` })
+                    .setTimestamp();
+                break;
+
+            case 'ROLE_UPDATE':
+                embed = new EmbedBuilder()
+                    .setColor('#ffa500') // Orange
+                    .setAuthor({ name: 'Member Updated', iconURL: data.member.user.displayAvatarURL() })
+                    .setDescription(`**${data.member.user.tag}** roles/nickname were updated.`)
+                    .addFields(data.changes)
+                    .setFooter({ text: `ID: ${data.member.id}` })
+                    .setTimestamp();
+                break;
+
+            case 'CHANNEL_CREATE':
+                embed = new EmbedBuilder()
+                    .setColor('#00ffff') // Cyan
+                    .setAuthor({ name: 'Channel Created', iconURL: guild.iconURL() })
+                    .setDescription(`**#${data.channel.name}** was created.`)
+                    .addFields(
+                        { name: 'Type', value: `${data.channel.type}`, inline: true },
+                        { name: 'Category', value: `${data.channel.parent ? data.channel.parent.name : 'None'}`, inline: true }
+                    )
+                    .setFooter({ text: `ID: ${data.channel.id}` })
+                    .setTimestamp();
+                break;
+
+            case 'CHANNEL_DELETE':
+                embed = new EmbedBuilder()
+                    .setColor('#ff00ff') // Magenta
+                    .setAuthor({ name: 'Channel Deleted', iconURL: guild.iconURL() })
+                    .setDescription(`**#${data.channel.name}** was deleted.`)
+                    .setFooter({ text: `ID: ${data.channel.id}` })
+                    .setTimestamp();
+                break;
+
+            case 'VOICE_UPDATE':
+                embed = new EmbedBuilder()
+                    .setColor('#ffff00') // Yellow
+                    .setAuthor({ name: 'Voice State Update', iconURL: data.member.user.displayAvatarURL() })
+                    .setDescription(data.description)
+                    .setFooter({ text: `ID: ${data.member.id}` })
+                    .setTimestamp();
+                break;
         }
 
         if (embed) {
