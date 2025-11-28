@@ -154,6 +154,54 @@ class ConversationalAI {
         }
     }
 
+    async analyzePartnershipRequest(data) {
+        try {
+            const prompt = `Analizza questa richiesta di partnership Discord.
+            
+            DATI SERVER:
+            - Nome: ${data.serverName}
+            - Descrizione: ${data.description}
+            - Membri: ${data.memberCount}
+            - Richiedente: ${data.user.username}
+            
+            CRITERI:
+            - Credibilità (0-100): Basata su membri e descrizione professionale.
+            - Rischio (LOW, MEDIUM, HIGH): Basato su parole chiave spam o descrizioni povere.
+            
+            Rispondi con un JSON valido:
+            {
+                "credibilityScore": numero,
+                "riskLevel": "LOW" | "MEDIUM" | "HIGH",
+                "summary": "breve analisi in italiano",
+                "recommendation": "APPROVE" | "DENY" | "MANUAL_REVIEW"
+            }`;
+
+            if (this.model) {
+                const result = await this.model.generateContent(prompt);
+                const response = await result.response;
+                const text = response.text();
+                const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                return JSON.parse(jsonStr);
+            }
+
+            // Fallback
+            return {
+                credibilityScore: 50,
+                riskLevel: 'MEDIUM',
+                summary: 'Analisi AI non disponibile.',
+                recommendation: 'MANUAL_REVIEW'
+            };
+        } catch (err) {
+            console.error('[AI] Errore analisi partnership:', err.message);
+            return {
+                credibilityScore: 0,
+                riskLevel: 'HIGH',
+                summary: 'Errore analisi AI.',
+                recommendation: 'MANUAL_REVIEW'
+            };
+        }
+    }
+
     getFromCache(key) {
         if (this.cache.has(key)) {
             const { value, timestamp } = this.cache.get(key);

@@ -1,18 +1,19 @@
 const PendingReward = require('../database/pendingRewardSchema');
 const errorLogger = require('../utils/errorLogger');
+const LogHandler = require('../handlers/logHandler');
 
 module.exports = {
     name: 'guildMemberAdd',
-    async execute(member, client) {
+    async execute(member) {
         try {
-            // Check if this guild is configured for rewards
-            // (Optional: Check if guild has active partnership campaign)
+            // 1. Log the Join
+            const logHandler = new LogHandler(member.client);
+            await logHandler.log('MEMBER_JOIN', member.guild, { member });
 
-            // Calculate unlock date (10 days from now)
+            // 2. Track Pending Reward (10 days unlock)
             const unlockDate = new Date();
             unlockDate.setDate(unlockDate.getDate() + 10);
 
-            // Create Pending Reward
             const pending = new PendingReward({
                 userId: member.id,
                 guildId: member.guild.id,
@@ -21,8 +22,7 @@ module.exports = {
             });
 
             await pending.save();
-
-            errorLogger.logInfo('INFO', `Tracking reward for user ${member.id} in ${member.guild.name}`, 'REWARD_TRACK_START');
+            errorLogger.logInfo('INFO', `Tracking reward for user ${member.id}`, 'REWARD_TRACK_START');
 
         } catch (error) {
             errorLogger.logError('ERROR', 'Failed to track member join', 'MEMBER_ADD_ERROR', error);
