@@ -8,14 +8,49 @@ const DiscordStrategy = require('passport-discord').Strategy;
 const path = require('path');
 const morgan = require('morgan');
 
+// Initialize Discord Bot
+require('../src/index.js');
+
 const app = express();
 const port = process.env.CHAT_API_PORT || 3001;
 
 // Middleware
-app.use(morgan('dev')); // Real-time HTTP logging
+// Advanced Logging Middleware (H24 Console Monitoring)
+app.use((req, res, next) => {
+    const start = Date.now();
+    const timestamp = new Date().toLocaleString('it-IT');
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    const method = req.method;
+    const url = req.url;
+
+    // Log incoming request
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`📥 [${timestamp}] ${method} ${url}`);
+    console.log(`🌐 IP: ${ip}`);
+    console.log(`💻 User-Agent: ${userAgent}`);
+
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        console.log(`👤 User: ${req.user.username}#${req.user.discriminator} (ID: ${req.user.id})`);
+    } else {
+        console.log(`👤 User: Not authenticated`);
+    }
+
+    // Capture response
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        const statusColor = res.statusCode >= 400 ? '\x1b[31m' : '\x1b[32m';
+        const resetColor = '\x1b[0m';
+
+        console.log(`📤 Response: ${statusColor}${res.statusCode}${resetColor} | ⏱️  ${duration}ms`);
+        console.log(`${'='.repeat(80)}\n`);
+    });
+
+    next();
+});
+
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname))); // Serve static files
 
 // Session & Passport
 app.use(session({
@@ -81,7 +116,27 @@ app.get('/logout', (req, res) => {
     req.logout(() => res.redirect('/'));
 });
 
-// --- Dashboard API ---
+// Dashboard Auth Middleware
+// --- Dashboard API (MUST BE BEFORE express.static) ---
+// Log Buffer for Dashboard
+const logBuffer = [];
+const MAX_LOGS = 50;
+
+function addToLogs(message) {
+    const timestamp = new Date().toLocaleTimeString('it-IT');
+    const logEntry = `[${timestamp}] ${message}`;
+    logBuffer.push(logEntry);
+    if (logBuffer.length > MAX_LOGS) logBuffer.shift();
+}
+
+// Add initial log
+addToLogs('[SYSTEM] Server started');
+
+app.get('/api/logs', (req, res) => {
+    // No authentication required for logs - they're just system messages
+    res.json(logBuffer);
+});
+
 app.get('/api/auth-status', (req, res) => {
     res.json({ enabled: isConfigured });
 });
@@ -94,7 +149,72 @@ app.get('/api/user', (req, res) => {
     }
 });
 
+app.get('/api/guilds', async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
+
+    try {
+        const userGuilds = req.user.guilds || [];
+        // Filter for Administrator permissions (0x8)
+        const adminGuilds = userGuilds.filter(g => (g.permissions & 0x8) === 0x8);
+
+        // Check if bot client is available globally
+        const botClient = global.discordClient;
+
+        if (botClient) {
+            addToLogs(`[DEBUG] Bot is in ${botClient.guilds.cache.size} servers`);
+        } else {
+            addToLogs(`[WARN] Bot client not available`);
+        }
+
+        const result = adminGuilds.map(g => {
+            const botInGuild = botClient ? botClient.guilds.cache.has(g.id) : false;
+            return {
+                id: g.id,
+                name: g.name,
+                icon: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
+                botInGuild: botInGuild,
+                permissions: g.permissions
+            };
+        });
+
+        res.json(result);
+    } catch (error) {
+        addToLogs(`[ERROR] Failed to fetch guilds: ${error.message}`);
+        console.error('Error fetching guilds:', error);
+        res.status(500).json({ error: 'Failed to fetch guilds' });
+    }
+});
+
+// Auth check for dashboard.html
+app.get('/dashboard.html', (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect('/auth/discord');
+    }
+    next();
+});
+
+// Serve static files AFTER auth checks and API routes
+app.use(express.static(path.join(__dirname)));
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    const timestamp = new Date().toLocaleString('it-IT');
+    console.error(`\n${'!'.repeat(80)}`);
+    console.error(`❌ [${timestamp}] ERROR DETECTED`);
+    console.error(`📍 Route: ${req.method} ${req.url}`);
+    console.error(`🌐 IP: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`);
+    console.error(`💥 Error: ${err.message}`);
+    console.error(`📚 Stack: ${err.stack}`);
+    console.error(`${'!'.repeat(80)}\n`);
+
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+});
+
 // Start Server
 app.listen(port, () => {
+    console.log(`\n${'🚀'.repeat(40)}`);
     console.log(`✅ MinfoAI Server running on http://localhost:${port}`);
+    console.log(`📊 Advanced Logging: ENABLED`);
+    console.log(`🔒 Discord OAuth: ${isConfigured ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`${'🚀'.repeat(40)}\n`);
 });

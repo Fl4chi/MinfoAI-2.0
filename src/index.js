@@ -30,6 +30,9 @@ const client = new Client({
   ]
 });
 
+// Make client available globally for website
+global.discordClient = client;
+
 client.commands = new Collection();
 
 // Gestione errori client Discord

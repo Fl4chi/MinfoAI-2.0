@@ -9,8 +9,74 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             padding-top: 80px;
+            background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 50%, #16213e 100%);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 0;
+            width: 100vw;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: 40px;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #fff, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #a855f7;
         }
 
         .dashboard-container {
@@ -18,91 +84,104 @@
             margin: 0 auto;
             padding: 2rem;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             padding: 1.5rem;
-        }
-
-        .card h3 {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #00ff88;
-            box-shadow: 0 0 10px #00ff88;
-        }
-
-        .log-console {
-            background: #000;
-            color: #0f0;
-            font-family: 'Consolas', monospace;
-            padding: 1rem;
-            border-radius: 10px;
-            height: 300px;
-            overflow-y: auto;
-            font-size: 0.9rem;
-        }
-
-        .log-entry {
-            margin-bottom: 5px;
-            border-bottom: 1px solid #111;
-            padding-bottom: 2px;
-        }
-
-        .log-time {
-            color: #666;
-            margin-right: 10px;
-        }
-
-        .log-type {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .log-type.INFO {
-            color: #00bbff;
-        }
-
-        .log-type.WARN {
-            color: #ffcc00;
-        }
-
-        .log-type.ERROR {
-            color: #ff4444;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
         }
 
-        .user-avatar {
-            width: 60px;
-            height: 60px;
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .server-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .server-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .server-icon {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 2px solid #6366f1;
+            margin-bottom: 1rem;
+            object-fit: cover;
+            background-color: #2f3136;
+        }
+
+        .server-name {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-visualizza {
+            background: #5865F2;
+            color: white;
+        }
+
+        .btn-visualizza:hover {
+            background: #4752c4;
+        }
+
+        .btn-invita {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .btn-invita:hover {
+            background: #00cc6a;
+        }
+
+        .loading {
+            color: #ccc;
+            font-style: italic;
         }
     </style>
 </head>
 
 <body>
-    <div class="background-glow"></div>
-
     <nav>
         <div class="logo">
             <img src="logo.png" alt="MinfoAI" class="logo-img">
@@ -110,57 +189,179 @@
         </div>
         <div class="links">
             <a href="/">Home</a>
-            <a href="/logout" style="color: #ff4444;">Logout</a>
+            <a href="/logout" id="logoutLink" style="display: none; color: #ff4444;">Logout</a>
         </div>
     </nav>
 
     <div class="dashboard-container">
-        <!-- User Info -->
-        <div class="card" style="grid-column: 1 / -1;">
+        <div class="card">
             <div class="user-profile" id="userProfile">
-                <div class="loading">Caricamento profilo...</div>
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Caricamento profilo...
+                </div>
             </div>
         </div>
 
-        <!-- Bot Status -->
-        <div class="card">
-            <h3>
-                <div class="status-indicator"></div> System Status
-            </h3>
-            <div style="margin-top: 1rem;">
-                <p><strong>Bot:</strong> <span style="color: #00ff88;">ONLINE</span></p>
-                <p><strong>Uptime:</strong> <span id="uptime">0h 0m</span></p>
-                <p><strong>Memory:</strong> <span id="memory">0 MB</span></p>
-                <p><strong>Ping:</strong> <span id="ping">0 ms</span></p>
-            </div>
-        </div>
-
-        <!-- Partnership Queue -->
-        <div class="card">
-            <h3><i class="fas fa-handshake"></i> Partnership Queue</h3>
-            <div id="partnershipQueue">
-                <p style="color: #888;">Nessuna richiesta in attesa.</p>
-            </div>
-        </div>
-
-        <!-- Live Logs -->
         <div class="card" style="grid-column: 1 / -1;">
-            <h3><i class="fas fa-terminal"></i> Live Logs</h3>
-            <div class="log-console" id="logConsole">
-                entry.innerHTML = `<span class="log-time">${time}</span><span
-                    class="log-type ${type}">${type}</span>${msg}`;
-                console.insertBefore(entry, console.firstChild);
-                }
+            <h3><i class="fas fa-terminal"></i> System Logs (Live)</h3>
+            <div id="logs-container"
+                style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                <div style="color: #00ff88;">[SYSTEM] Dashboard initialized...</div>
+                <div style="color: #aaa;">[INFO] Connecting to log stream...</div>
+            </div>
+        </div>
 
-                setInterval(() => {
-                // Mock data for demo
-                const types = ['INFO', 'INFO', 'WARN'];
-                const msgs = ['Checking partnership queue...', 'Heartbeat received', 'High latency detected'];
-                if (Math.random() > 0.7) {
-                addLog(types[Math.floor(Math.random() * 3)], msgs[Math.floor(Math.random() * 3)]);
+        <div class="card">
+            <h3><i class="fas fa-server"></i> I Tuoi Server (Admin)</h3>
+            <div class="server-grid" id="serverGrid">
+                <div class="loading">Caricamento server...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Widget -->
+    <div id="ai-chat-widget"
+        style="position: fixed; bottom: 20px; right: 20px; width: 350px; background: rgba(20, 20, 40, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 2000;">
+        <div
+            style="padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #6366f1, #a855f7);">
+            <span style="font-weight: bold;"><i class="fas fa-robot"></i> MinfoAI Assistant</span>
+            <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer;"><i
+                    class="fas fa-times"></i></button>
+        </div>
+        <div id="chat-messages"
+            style="height: 300px; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+            <div
+                style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; align-self: flex-start; max-width: 80%;">
+                Ciao! Sono l'assistente AI. Come posso aiutarti con il tuo server?
+            </div>
+        </div>
+        <div style="padding: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 10px;">
+            <input type="text" id="chat-input" placeholder="Scrivi un messaggio..."
+                style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 5px; color: white;">
+            <button onclick="sendMessage()"
+                style="background: #6366f1; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer;"><i
+                    class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <button onclick="toggleChat()"
+        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); z-index: 1999; transition: transform 0.3s;">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <script>
+        // Chat Functions
+        function toggleChat() {
+            const widget = document.getElementById('ai-chat-widget');
+            const btn = document.querySelector('button[onclick="toggleChat()"]');
+            if (widget.style.display === 'none') {
+                widget.style.display = 'flex';
+                btn.style.display = 'none';
+            } else {
+                widget.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML += `<div style="background: #6366f1; padding: 10px; border-radius: 10px; align-self: flex-end; max-width: 80%;">${msg}</div>`;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => {
+                chat.innerHTML += `<div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; align-self: flex-start; max-width: 80%;">Sto analizzando la tua richiesta... (Funzionalità AI in arrivo)</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            }, 1000);
+        }
+
+        // Poll Logs
+        function fetchLogs() {
+            fetch('/api/logs')
+                .then(res => res.json())
+                .then(logs => {
+                    const container = document.getElementById('logs-container');
+                    container.innerHTML = logs.map(log => {
+                        const color = log.includes('[ERROR]') ? '#ff4444' : (log.includes('[WARN]') ? '#ffbb33' : '#00ff88');
+                        return `<div style="color: ${color}; margin-bottom: 4px;">${log}</div>`;
+                    }).join('');
+                    container.scrollTop = container.scrollHeight;
+                })
+                .catch(err => console.error('Log fetch error:', err));
+        }
+
+        setInterval(fetchLogs, 2000);
+        setTimeout(fetchLogs, 500);
+
+        // Fetch User Profile
+        fetch('/api/user')
+            .then(res => {
+                if (res.status === 401) {
+                    window.location.href = '/auth/discord';
+                    return null;
                 }
-                }, 5000);
-                </script>
+                return res.json();
+            })
+            .then(user => {
+                if (!user) return;
+
+                document.getElementById('logoutLink').style.display = 'inline';
+                document.getElementById('userProfile').innerHTML = `
+                    <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #6366f1;">
+                    <div>
+                        <h2 style="margin: 0;">${user.username}</h2>
+                        <p style="color: #888; margin: 5px 0 0 0;">ID: ${user.id}</p>
+                    </div>
+                `;
+
+                fetchGuilds();
+            });
+
+        // Fetch Guilds
+        function fetchGuilds() {
+            const grid = document.getElementById('serverGrid');
+
+            fetch('/api/guilds')
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                    return res.json();
+                })
+                .then(guilds => {
+                    grid.innerHTML = '';
+
+                    if (!guilds || guilds.length === 0) {
+                        grid.innerHTML = '<p style="color: #888; grid-column: 1/-1; text-align: center;">Nessun server trovato in cui sei amministratore.</p>';
+                        return;
+                    }
+
+                    guilds.forEach(guild => {
+                        const icon = guild.icon
+                            ? (guild.icon.startsWith('http') ? guild.icon : `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`)
+                            : 'https://cdn.discordapp.com/embed/avatars/0.png';
+
+                        const buttonHtml = guild.botInGuild
+                            ? `<a href="/manage/${guild.id}" class="btn btn-visualizza">GESTISCI</a>`
+                            : `<a href="https://discord.com/api/oauth2/authorize?client_id=1421143958649704578&permissions=8&scope=bot&guild_id=${guild.id}" target="_blank" class="btn btn-invita">INVITA</a>`;
+
+                        grid.innerHTML += `
+                            <div class="server-card">
+                                <img src="${icon}" class="server-icon" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                                <div class="server-name" title="${guild.name}">${guild.name}</div>
+                                ${buttonHtml}
+                            </div>
+                        `;
+                    });
+                })
+                .catch(err => {
+                    console.error('Errore fetchGuilds:', err);
+                    grid.innerHTML = `<p style="color: #ff4444; grid-column: 1/-1; text-align: center;">Errore caricamento: ${err.message}</p>`;
+                });
+        }
+    </script>
 </body>
 
 </html>
