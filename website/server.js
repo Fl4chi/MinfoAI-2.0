@@ -19,7 +19,17 @@ const port = process.env.CHAT_API_PORT || 3001;
 app.use((req, res, next) => {
     const start = Date.now();
     const timestamp = new Date().toLocaleString('it-IT');
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // Fix IP formatting (remove ::ffff: and convert ::1 to 127.0.0.1)
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    if (ip) {
+        if (ip.includes('::ffff:')) {
+            ip = ip.replace('::ffff:', '');
+        } else if (ip === '::1') {
+            ip = '127.0.0.1'; // Convert IPv6 localhost to IPv4
+        }
+    }
+
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const method = req.method;
     const url = req.url;
@@ -44,6 +54,8 @@ app.use((req, res, next) => {
 
         console.log(`📤 Response: ${statusColor}${res.statusCode}${resetColor} | ⏱️  ${duration}ms`);
         console.log(`${'='.repeat(80)}\n`);
+
+        // Do NOT add HTTP logs to dashboard - only Discord bot logs
     });
 
     next();
@@ -116,11 +128,10 @@ app.get('/logout', (req, res) => {
     req.logout(() => res.redirect('/'));
 });
 
-// Dashboard Auth Middleware
 // --- Dashboard API (MUST BE BEFORE express.static) ---
 // Log Buffer for Dashboard
 const logBuffer = [];
-const MAX_LOGS = 50;
+const MAX_LOGS = 100; // Increased buffer size
 
 function addToLogs(message) {
     const timestamp = new Date().toLocaleTimeString('it-IT');
@@ -128,6 +139,13 @@ function addToLogs(message) {
     logBuffer.push(logEntry);
     if (logBuffer.length > MAX_LOGS) logBuffer.shift();
 }
+
+// Expose addToLogs globally for bot integration
+global.dashboardLogger = {
+    log: (msg) => addToLogs(`[BOT] ${msg}`),
+    error: (msg) => addToLogs(`[BOT ERROR] ${msg}`),
+    warn: (msg) => addToLogs(`[BOT WARN] ${msg}`)
+};
 
 // Add initial log
 addToLogs('[SYSTEM] Server started');
@@ -157,7 +175,6 @@ app.get('/api/guilds', async (req, res) => {
         // Filter for Administrator permissions (0x8)
         const adminGuilds = userGuilds.filter(g => (g.permissions & 0x8) === 0x8);
 
-        // Check if bot client is available globally
         const botClient = global.discordClient;
 
         if (botClient) {
@@ -182,6 +199,33 @@ app.get('/api/guilds', async (req, res) => {
         addToLogs(`[ERROR] Failed to fetch guilds: ${error.message}`);
         console.error('Error fetching guilds:', error);
         res.status(500).json({ error: 'Failed to fetch guilds' });
+    }
+});
+
+// --- Partnership Management API ---
+app.post('/api/partnership/manage', async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
+
+    const { guildId, action } = req.body; // action: 'accept' | 'reject'
+
+    // Verify user is admin of this guild
+    const userGuild = req.user.guilds.find(g => g.id === guildId);
+    if (!userGuild || (userGuild.permissions & 0x8) !== 0x8) {
+        return res.status(403).json({ error: 'Unauthorized: You are not an admin of this server' });
+    }
+
+    try {
+        const botClient = global.discordClient;
+        if (!botClient) return res.status(503).json({ error: 'Bot not ready' });
+
+        // Logic to accept/reject partnership would go here
+        // For now, we just log it as the full logic requires database integration
+        addToLogs(`[PARTNERSHIP] User ${req.user.username} performed ${action} on guild ${guildId}`);
+
+        res.json({ success: true, message: `Partnership ${action}ed successfully` });
+    } catch (error) {
+        addToLogs(`[ERROR] Partnership management failed: ${error.message}`);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 

@@ -11,25 +11,34 @@ module.exports = async (client) => {
       return;
     }
 
-    const eventFiles = fs.readdirSync(eventsPath).filter(f => f.endsWith('.js'));
+    const readEvents = (dir) => {
+      const files = fs.readdirSync(dir, { withFileTypes: true });
 
-    for (const file of eventFiles) {
-      try {
-        const filePath = path.join(eventsPath, file);
-        const event = require(filePath);
-        const eventName = event.name || file.split('.')[0];
+      for (const file of files) {
+        const fullPath = path.join(dir, file.name);
 
-        if (event.once) {
-          client.once(eventName, (...args) => event.execute(...args, client));
-        } else {
-          client.on(eventName, (...args) => event.execute(...args, client));
+        if (file.isDirectory()) {
+          readEvents(fullPath);
+        } else if (file.name.endsWith('.js')) {
+          try {
+            const event = require(fullPath);
+            const eventName = event.name || file.name.split('.')[0];
+
+            if (event.once) {
+              client.once(eventName, (...args) => event.execute(...args, client));
+            } else {
+              client.on(eventName, (...args) => event.execute(...args, client));
+            }
+
+            errorLogger.logInfo('INFO', `Loaded event: ${eventName}`, 'EVENT_LOADED');
+          } catch (err) {
+            errorLogger.logError('ERROR', `Failed to load event ${file.name}`, 'EVENT_LOAD_ERROR', err);
+          }
         }
-
-        errorLogger.logInfo('INFO', `Loaded event: ${eventName}`, 'EVENT_LOADED');
-      } catch (err) {
-        errorLogger.logError('ERROR', `Failed to load event ${file}`, 'EVENT_LOAD_ERROR', err);
       }
-    }
+    };
+
+    readEvents(eventsPath);
   } catch (err) {
     errorLogger.logError('CRITICAL', 'Error in event handler', 'EVENT_HANDLER_ERROR', err);
   }
