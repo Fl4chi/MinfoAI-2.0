@@ -234,47 +234,45 @@
                     return;
                 }
 
-                // TODO: Implementare chiamate API per dati reali del server
-                // Per ora mostriamo dati di esempio
+                // Fetch real server data
+                const statsResponse = await fetch(`/api/guilds/${guildId}/stats`);
+                if (!statsResponse.ok) throw new Error('Failed to fetch stats');
+                const stats = await statsResponse.json();
 
                 document.getElementById('serverHeader').innerHTML = `
-                    <img src="https://cdn.discordapp.com/embed/avatars/0.png" class="server-icon">
+                    <img src="https://cdn.discordapp.com/icons/${guildId}/${urlParams.get('icon') || '0'}.png" class="server-icon" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
                     <div>
                         <h1>Server ${guildId}</h1>
                         <p style="color: #888;">Gestione completa del server</p>
                     </div>
                 `;
 
-                // Statistiche mockate
-                document.getElementById('memberCount').textContent = '1,234';
-                document.getElementById('partnershipCount').textContent = '42';
-                document.getElementById('economyBalance').textContent = '5,678';
-                document.getElementById('tierLevel').textContent = 'Gold 🥇';
+                // Update Stats
+                document.getElementById('memberCount').textContent = stats.memberCount.toLocaleString();
+                document.getElementById('partnershipCount').textContent = stats.partnershipCount.toLocaleString();
+                document.getElementById('economyBalance').textContent = stats.economy.balance.toLocaleString();
 
-                // Logs simulati
+                const tier = stats.economy.tier.charAt(0).toUpperCase() + stats.economy.tier.slice(1);
+                let tierEmoji = '🥉';
+                if (tier === 'Silver') tierEmoji = '🥈';
+                if (tier === 'Gold') tierEmoji = '🥇';
+                if (tier === 'Platinum') tierEmoji = '💎';
+
+                document.getElementById('tierLevel').textContent = `${tier} ${tierEmoji}`;
+
+                // Logs simulati (per ora, in futuro collegare a DB logs)
                 document.getElementById('logs-container').innerHTML = `
-                    <div style="color: #00ff88;">[${new Date().toLocaleTimeString()}] Server configurato</div>
-                    <div style="color: #6366f1;">[${new Date().toLocaleTimeString()}] Partnership ricevuta</div>
-                    <div style="color: #ffbb33;">[${new Date().toLocaleTimeString()}] Attendendo approvazione staff</div>
+                    <div style="color: #00ff88;">[${new Date().toLocaleTimeString()}] Dati aggiornati dal database</div>
                 `;
 
-                // Partnership mockate
-                document.getElementById('partnershipList').innerHTML = `
-                    <div class="partnership-item">
-                        <div class="partnership-info">
-                            <strong>Server Example</strong>
-                            <p style="color: #888; font-size: 0.9rem;">Richiesta partnership • 2 ore fa</p>
-                        </div>
-                        <div class="partnership-actions">
-                            <button class="btn btn-accept" onclick="managePartnership('accept', 'example1')">
-                                <i class="fas fa-check"></i> ACCETTA
-                            </button>
-                            <button class="btn btn-reject" onclick="managePartnership('reject', 'example1')">
-                                <i class="fas fa-times"></i> RIFIUTA
-                            </button>
-                        </div>
-                    </div>
-                `;
+                // Partnership (Placeholder finché non implementiamo la collection delle richieste)
+                if (stats.partnerships && stats.partnerships.length > 0) {
+                    // Render partnerships
+                } else {
+                    document.getElementById('partnershipList').innerHTML = `
+                        <p style="color: #888;">Nessuna partnership in attesa.</p>
+                    `;
+                }
 
             } catch (error) {
                 console.error('Error loading server data:', error);

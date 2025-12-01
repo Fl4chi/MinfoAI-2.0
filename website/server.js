@@ -10,12 +10,28 @@ const morgan = require('morgan');
 
 // Initialize Discord Bot
 require('../src/index.js');
+const GuildConfig = require('../src/database/guildConfigSchema');
 
 const app = express();
 const port = process.env.CHAT_API_PORT || 3001;
 
 // Middleware
-// Advanced Logging Middleware (H24 Console Monitoring)
+app.use(cors());
+app.use(express.json());
+
+// Session & Passport (MUST come before logging to access req.user)
+app.use(session({
+    secret: 'minfoai-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+// Advanced Logging Middleware (AFTER passport so req.user is available)
 app.use((req, res, next) => {
     const start = Date.now();
     const timestamp = new Date().toLocaleString('it-IT');
@@ -41,7 +57,7 @@ app.use((req, res, next) => {
     console.log(`💻 User-Agent: ${userAgent}`);
 
     if (req.isAuthenticated && req.isAuthenticated()) {
-        console.log(`👤 User: ${req.user.username}#${req.user.discriminator} (ID: ${req.user.id})`);
+        console.log(`👤 User: ${req.user.username}#${req.user.discriminator || '0'} (ID: ${req.user.id})`);
     } else {
         console.log(`👤 User: Not authenticated`);
     }
@@ -60,21 +76,6 @@ app.use((req, res, next) => {
 
     next();
 });
-
-app.use(cors());
-app.use(express.json());
-
-// Session & Passport
-app.use(session({
-    secret: 'minfoai-secret-key',
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
 
 // Discord Strategy
 const clientID = process.env.DISCORD_CLIENT_ID;
@@ -226,6 +227,47 @@ app.post('/api/partnership/manage', async (req, res) => {
     } catch (error) {
         addToLogs(`[ERROR] Partnership management failed: ${error.message}`);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// --- Server Stats API ---
+app.get('/api/guilds/:id/stats', async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
+
+    const guildId = req.params.id;
+
+    // Verify user is admin of this guild
+    const userGuild = req.user.guilds.find(g => g.id === guildId);
+    if (!userGuild || (userGuild.permissions & 0x8) !== 0x8) {
+        return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    try {
+        const config = await GuildConfig.findOne({ guildId });
+
+        if (!config) {
+            // Return default/empty data if not configured
+            return res.json({
+                memberCount: 0,
+                partnershipCount: 0,
+                economy: { balance: 0, tier: 'bronze' },
+                partnerships: []
+            });
+        }
+
+        res.json({
+            memberCount: config.serverProfile?.memberCount || 0,
+            partnershipCount: config.economy?.tierStats?.activePartnerships || 0,
+            economy: {
+                balance: config.economy?.balance || 0,
+                tier: config.economy?.tier || 'bronze'
+            },
+            // TODO: Add real partnership requests when schema supports it
+            partnerships: []
+        });
+    } catch (error) {
+        console.error('Stats fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch stats' });
     }
 });
 
