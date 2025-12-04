@@ -36,14 +36,19 @@ app.use((req, res, next) => {
     const start = Date.now();
     const timestamp = new Date().toLocaleString('it-IT');
 
-    // Fix IP formatting (remove ::ffff: and convert ::1 to 127.0.0.1)
+    // Improved IP extraction
     let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    if (ip) {
-        if (ip.includes('::ffff:')) {
-            ip = ip.replace('::ffff:', '');
-        } else if (ip === '::1') {
-            ip = '127.0.0.1'; // Convert IPv6 localhost to IPv4
-        }
+    
+    // Handle multiple IPs in x-forwarded-for (take the first one)
+    if (ip && ip.indexOf(',') > -1) {
+        ip = ip.split(',')[0].trim();
+    }
+
+    // Clean up IPv6 prefix
+    if (ip && ip.includes('::ffff:')) {
+        ip = ip.replace('::ffff:', '');
+    } else if (ip === '::1') {
+        ip = '127.0.0.1 (Localhost)';
     }
 
     const userAgent = req.headers['user-agent'] || 'Unknown';
@@ -54,7 +59,7 @@ app.use((req, res, next) => {
     console.log(`\n${'='.repeat(80)}`);
     console.log(`📥 [${timestamp}] ${method} ${url}`);
     console.log(`🌐 IP: ${ip}`);
-    console.log(`💻 User-Agent: ${userAgent}`);
+    // console.log(`💻 User-Agent: ${userAgent}`); // Reduced noise
 
     if (req.isAuthenticated && req.isAuthenticated()) {
         console.log(`👤 User: ${req.user.username}#${req.user.discriminator || '0'} (ID: ${req.user.id})`);
